@@ -2,6 +2,10 @@
 
 bool FGNS::cp(FGNS::Block &block, std::string src, std::string dst, int mode)
 {
+    if ((mode == 0) && (src.back() == '*'))
+    {
+        src = FGNS::root_get_target_fuzzy(block, src);
+    }
     if (!FGNS::exists(block, src, mode))
     {
         std::cerr << "File does not exist" << std::endl;

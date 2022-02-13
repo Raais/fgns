@@ -13,6 +13,8 @@
 
 namespace FGNS
 {
+namespace Crypto
+{
 
 std::string GenerateSalt();
 std::string SHA256Digest(const std::string& input);
@@ -22,4 +24,5 @@ CryptoPP::SecByteBlock KDF(std::string password, std::string iv);
 std::string AESEncryptString(CryptoPP::SecByteBlock &key, const std::string &str);
 std::string AESDecryptString(CryptoPP::SecByteBlock &key, const std::string &str);
 
+}
 }

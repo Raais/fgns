@@ -2,6 +2,10 @@
 
 bool FGNS::fexport(FGNS::Block &block, std::string target, std::string target_ext, int mode)
 {
+    if ((mode == 0) && (target.back() == '*'))
+    {
+        target = FGNS::root_get_target_fuzzy(block, target);
+    }
     if (target_ext == "")
     {
         target_ext = target;

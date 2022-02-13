@@ -1,6 +1,6 @@
 #include "str_crypto.h"
 
-std::string FGNS::GenerateSalt()
+std::string FGNS::Crypto::GenerateSalt()
 {
   std::string salt;
   salt.resize(16);
@@ -9,7 +9,7 @@ std::string FGNS::GenerateSalt()
   return salt;
 }
 
-std::string FGNS::SHA256Digest(const std::string& input)
+std::string FGNS::Crypto::SHA256Digest(const std::string& input)
 {
   std::string digest;
 
@@ -24,19 +24,19 @@ std::string FGNS::SHA256Digest(const std::string& input)
   return digest;
 }
 
-std::string FGNS::HashPassword(std::string input, const std::string &salt)
+std::string FGNS::Crypto::HashPassword(std::string input, const std::string &salt)
 {
   input = input + salt;
-  return SHA256Digest(input);
+  return FGNS::Crypto::SHA256Digest(input);
 }
 
-bool FGNS::AuthenticatePassword(std::string input, const std::string &auth_hash, const std::string &salt)
+bool FGNS::Crypto::AuthenticatePassword(std::string input, const std::string &auth_hash, const std::string &salt)
 {
-  std::string input_hash = FGNS::HashPassword(input, salt);
+  std::string input_hash = FGNS::Crypto::HashPassword(input, salt);
   return input_hash == auth_hash;
 }
 
-CryptoPP::SecByteBlock FGNS::KDF(std::string password, std::string iv)
+CryptoPP::SecByteBlock FGNS::Crypto::KDF(std::string password, std::string iv)
 {
   CryptoPP::SecByteBlock key(CryptoPP::AES::MAX_KEYLENGTH+CryptoPP::AES::BLOCKSIZE);
   CryptoPP::HKDF<CryptoPP::SHA256> hkdf;
@@ -44,7 +44,7 @@ CryptoPP::SecByteBlock FGNS::KDF(std::string password, std::string iv)
   return key;
 }
 
-std::string FGNS::AESEncryptString(CryptoPP::SecByteBlock &key, const std::string &str)
+std::string FGNS::Crypto::AESEncryptString(CryptoPP::SecByteBlock &key, const std::string &str)
 {
   std::string ciphertext;
   CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption e;
@@ -57,7 +57,7 @@ std::string FGNS::AESEncryptString(CryptoPP::SecByteBlock &key, const std::strin
   return ciphertext;
 }
 
-std::string FGNS::AESDecryptString(CryptoPP::SecByteBlock &key, const std::string &str)
+std::string FGNS::Crypto::AESDecryptString(CryptoPP::SecByteBlock &key, const std::string &str)
 {
   std::string plaintext;
   CryptoPP::CBC_Mode<CryptoPP::AES>::Decryption d;

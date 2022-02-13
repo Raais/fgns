@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     FGNS::touch(block, "test.txt");
     FGNS::touch(block, "test2.tsxt");
     FGNS::write(block, "test2.tsxt", "hfdsjhf fdsjh djsfhsdj fdskjfhdfkjds hfk jhsdkfh dskf");
+    FGNS::cat(block, "test2.ts*");
     FGNS::touch(block, "test3.txt");
     FGNS::ls(block);
 

@@ -2,6 +2,10 @@
 
 bool FGNS::info(FGNS::Block &block, std::string target, int mode)
 {
+    if ((mode == 0) && (target.back() == '*'))
+    {
+        target = FGNS::root_get_target_fuzzy(block, target);
+    }
     if (FGNS::exists(block, target, mode))
     {
         FGNS::File &file = *FGNS::getf_ptr(block, target, mode);
