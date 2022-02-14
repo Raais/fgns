@@ -94,14 +94,14 @@ int main(int argc, char *argv[])
     if (result.count("file"))
     {
         std::string arg = result["file"].as<std::string>();
-        if(arg.find(".xz") != std::string::npos)
-        {
-            FGNS::decompress_ext(arg);
-            arg.erase(arg.size() - 3, 3);
-            compressed = true;
-        }
         if(FGNS::exists_ext(arg))
         {
+            if(arg.find(".xz") != std::string::npos)
+            {
+                FGNS::decompress_ext(arg);
+                arg.erase(arg.size() - 3, 3);
+                compressed = true;
+            }
             block = FGNS::load_bin(arg);
             loaded = true;
             loaded_file = arg;
