@@ -1,21 +1,21 @@
 #include "core_utils.h"
 
-bool FGNS::fexport(FGNS::Block &block, std::string target, std::string target_ext, int mode)
+bool FGNS::fexport(FGNS::Block &block, std::string src, std::string dst_ext, int mode)
 {
-    if ((mode == 0) && (target.back() == '*'))
+    if ((mode == 0) && (src.back() == '*'))
     {
-        target = FGNS::root_get_target_fuzzy(block, target);
+        src = FGNS::root_get_target_fuzzy(block, src);
     }
-    if (target_ext == "")
+    if (dst_ext == "")
     {
-        target_ext = target;
+        dst_ext = src;
     }
 
-    if(FGNS::exists(block, target, mode))
+    if(FGNS::exists(block, src, mode))
     {
-        FGNS::File &file = *FGNS::getf_ptr(block, target, mode);
+        FGNS::File &file = *FGNS::get_file_ptr(block, src, mode);
 
-        std::ofstream outfile(target_ext, std::ios::out | std::ios::binary | std::ios::trunc);
+        std::ofstream outfile(dst_ext, std::ios::out | std::ios::binary | std::ios::trunc);
         outfile.write(file.content.c_str(), file.content.size());
         outfile.close();
 

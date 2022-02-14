@@ -18,7 +18,7 @@ bool FGNS::mv(FGNS::Block &block, std::string src, std::string dst, int mode)
     }
     else
     {
-        FGNS::File &source = *FGNS::getf_ptr(block, src, mode);
+        FGNS::File &source = *FGNS::get_file_ptr(block, src, mode);
 
         source.TIMESTAMP = (unsigned int)std::time(NULL);
         source.name = dst;

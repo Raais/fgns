@@ -1,14 +1,14 @@
 #include "core_utils.h"
 
-bool FGNS::decrypt(FGNS::Block &block, std::string target, std::string password, int mode)
+bool FGNS::decrypt(FGNS::Block &block, std::string dst, std::string password, int mode)
 {
-    if ((mode == 0) && (target.back() == '*'))
+    if ((mode == 0) && (dst.back() == '*'))
     {
-        target = FGNS::root_get_target_fuzzy(block, target);
+        dst = FGNS::root_get_target_fuzzy(block, dst);
     }
-    if (FGNS::exists(block, target, mode))
+    if (FGNS::exists(block, dst, mode))
     {
-        FGNS::File &file = *FGNS::getf_ptr(block, target, mode);
+        FGNS::File &file = *FGNS::get_file_ptr(block, dst, mode);
 
         if (file.ENCRYPTED)
         {

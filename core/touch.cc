@@ -1,11 +1,11 @@
 #include "core_utils.h"
 
-bool FGNS::touch(FGNS::Block &block, std::string target)
+bool FGNS::touch(FGNS::Block &block, std::string dst)
 {
-    if (!FGNS::exists(block, target, 0))
+    if (!FGNS::exists(block, dst, 0))
     {
         FGNS::File new_file(block.F_IDGEN);
-        new_file.name = target;
+        new_file.name = dst;
         block.root.push_back(new_file);
         block.F_IDGEN++;
 

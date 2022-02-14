@@ -1,16 +1,20 @@
 #include "core_utils.h"
 
-bool FGNS::import(FGNS::Block &block, std::string target_ext)
+bool FGNS::import(FGNS::Block &block, std::string dst_ext)
 {
-    if(FGNS::exists_ext(target_ext))
+    if (dst_ext.back() == '*')
     {
-        std::ifstream file_ext(target_ext);
+        dst_ext = FGNS::fs_get_target_fuzzy(dst_ext);
+    }
+    if(FGNS::exists_ext(dst_ext))
+    {
+        std::ifstream file_ext(dst_ext);
         std::string content((std::istreambuf_iterator<char>(file_ext)), std::istreambuf_iterator<char>());
         file_ext.close();
-        if(!FGNS::exists(block, target_ext))
+        if(!FGNS::exists(block, dst_ext))
         {
-            FGNS::touch(block, target_ext);
-            FGNS::write(block, target_ext, content);
+            FGNS::touch(block, dst_ext);
+            FGNS::write(block, dst_ext, content);
 
             return true;
         }
