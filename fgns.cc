@@ -48,7 +48,9 @@ int main(int argc, char *argv[])
         ("A,encrypt", "(-t <src>) AES encrypt with <password>", cxxopts::value<std::string>())
         ("D,decrypt", "(-t <src>) decrypt with <password>", cxxopts::value<std::string>())
         ("i,import", "import external <dst_ext>", cxxopts::value<std::string>())
-        ("I,importdir", "import external <dstdir_ext>", cxxopts::value<std::string>())
+        ("I,importdir", "import external <dstdir_ext>\nSee also:\n"\
+                        "find <expr> -type f -exec fgns -f <FILE> -i {} \\;",\
+         cxxopts::value<std::string>())
         ("e,export", "(-t <src>) export to <dst_ext>", cxxopts::value<std::string>())
         ("q,exists", "check if <dst> exists", cxxopts::value<std::string>())
         ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
