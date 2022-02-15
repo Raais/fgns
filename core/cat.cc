@@ -10,13 +10,13 @@ bool FGNS::cat(FGNS::Block &block, std::string dst, int mode)
     {
         FGNS::File &file = *FGNS::get_file_ptr(block, dst, mode);
 
-        std::cout << file.content << std::endl;
+        printf("%s", file.content.c_str());
         
         return true;
     }
     else
     {
-        std::cerr << "File does not exist" << std::endl;
+        printf("%s", "File does not exist");
         return false;
     }
 }

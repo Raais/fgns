@@ -16,7 +16,7 @@ bool FGNS::write(FGNS::Block &block, std::string dst, std::string content, int m
     }
     else
     {
-        std::cerr << "File does not exist" << std::endl;
+        fprintf(stderr, "File does not exist\n");
         return false;
     }
 }

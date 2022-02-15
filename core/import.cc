@@ -13,6 +13,7 @@ bool FGNS::import(FGNS::Block &block, std::string dst_ext)
         file_ext.close();
         if(!FGNS::exists(block, dst_ext))
         {
+            dst_ext = FGNS::input_sanitizer_special_chars(dst_ext);
             FGNS::touch(block, dst_ext);
             FGNS::write(block, dst_ext, content);
 
@@ -20,13 +21,13 @@ bool FGNS::import(FGNS::Block &block, std::string dst_ext)
         }
         else
         {
-            std::cerr << "File already exists" << std::endl;
+            fprintf(stderr, "File already exists\n");
             return false;
         }
     }
     else
     {
-        std::cerr << "External file not found" << std::endl;
+        fprintf(stderr, "File does not exist\n");
         return false;
     }
 }

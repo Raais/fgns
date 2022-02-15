@@ -14,6 +14,6 @@ void FGNS::ls(FGNS::Block &block)
         {
             preview = file.content;
         }
-        std::cout << "[" << file.ID << "]" << " -- " << file.TIMESTAMP << " -- $=" << file.ENCRYPTED << " -- " << file.name << " (" << file.content.size() << ") -> \"" << preview << "\"" << std::endl;
+        printf("[%u] -- %u -- $=%d -- %s (%zu) -> \"%s\"\n", file.ID, file.TIMESTAMP, file.ENCRYPTED, file.name.c_str(), file.content.size(), preview.c_str());
     }
 }

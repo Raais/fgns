@@ -17,7 +17,7 @@ bool FGNS::rm(FGNS::Block &block, std::string dst, int mode)
     }
     else
     {
-        std::cerr << "File does not exist" << std::endl;
+        fprintf(stderr, "File does not exist\n");
         return false;
     }
 }

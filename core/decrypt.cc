@@ -27,25 +27,25 @@ bool FGNS::decrypt(FGNS::Block &block, std::string dst, std::string password, in
                 }
                 else
                 {
-                    std::cerr << "Password is incorrect" << std::endl;
+                    fprintf(stderr, "Wrong password\n");
                     return false;
                 }
             }
             else
             {
-                std::cerr << "File is empty" << std::endl;
+                fprintf(stderr, "File is empty\n");
                 return false;
             }
         }
         else
         {
-            std::cerr << "File is not encrypted" << std::endl;
+            fprintf(stderr, "File is not encrypted\n");
             return false;
         }
     }
     else
     {
-        std::cerr << "File does not exist" << std::endl;
+        fprintf(stderr, "File does not exist\n");
         return false;
     }
 }

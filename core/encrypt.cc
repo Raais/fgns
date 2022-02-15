@@ -26,19 +26,19 @@ bool FGNS::encrypt(FGNS::Block &block, std::string dst, std::string password, in
             }
             else
             {
-                std::cerr << "File is empty" << std::endl;
+                fprintf(stderr, "File is empty\n");
                 return false;
             }
         }
         else
         {
-            std::cerr << "File is already encrypted" << std::endl;
+            fprintf(stderr, "File is already encrypted\n");
             return false;
         }
     }
     else
     {
-        std::cerr << "File does not exist" << std::endl;
+        fprintf(stderr, "File does not exist\n");
         return false;
     }
 }

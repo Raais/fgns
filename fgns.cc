@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -7,8 +7,28 @@
 
 #include "cxxopts.hpp"
 
-#define FGNS_VERSION         "0.9.0"
-#define FGNS_BLOCK_EXTENSION ".fgns"
+#define FGNS_VERSION         "0.9.1"
+#define FLAT_BLOCK_EXTENSION ".cfb3" // "Cereal"ized flat block (3 is cool))
+#define LICENSE_TEXT "Copyright (c) 2022 Raais N.\n" \
+"\n" \
+"Permission is hereby granted, free of charge, to any person obtaining a copy\n" \
+"of this software and associated documentation files (the \"Software\"), to deal\n" \
+"in the Software without restriction, including without limitation the rights\n" \
+"to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n" \
+"copies of the Software, and to permit persons to whom the Software is\n" \
+"furnished to do so, subject to the following conditions:\n" \
+"\n" \
+"The above copyright notice and this permission notice shall be included in all\n" \
+"copies or substantial portions of the Software.\n" \
+"\n" \
+"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" \
+"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" \
+"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" \
+"AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" \
+"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" \
+"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n" \
+"SOFTWARE.\n"
+
 
 int main(int argc, char *argv[])
 {
@@ -28,7 +48,7 @@ int main(int argc, char *argv[])
         ("f,file", "input block <FILE>", cxxopts::value<std::string>())
         ("t,target", "positional argument (-t <src> -...)", cxxopts::value<std::string>())
         ("l,ls", "print root")
-        ("T,touch", "create <dst>", cxxopts::value<std::string>())
+        ("n,touch", "create <dst>", cxxopts::value<std::string>())
         ("r,rm", "delete <dst>", cxxopts::value<std::string>())
         ("c,cp", "(-t <src>) copy to <dst>", cxxopts::value<std::string>())
         ("m,mv", "(-t <src>) rename to <dst>", cxxopts::value<std::string>())
@@ -38,12 +58,13 @@ int main(int argc, char *argv[])
         ("A,encrypt", "(-t <src>) AES encrypt with <password>", cxxopts::value<std::string>())
         ("D,decrypt", "(-t <src>) decrypt with <password>", cxxopts::value<std::string>())
         ("i,import", "import external <dst_ext>", cxxopts::value<std::string>())
+        ("I,importdir", "import external <dstdir_ext>", cxxopts::value<std::string>())
         ("e,export", "(-t <src>) export to <dst_ext>", cxxopts::value<std::string>())
         ("q,exists", "check if <dst> exists", cxxopts::value<std::string>())
         ("X,compress", "compress block", cxxopts::value<std::string>())
         ("x,decompress", "decompress block.xz", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
-        ("Z,autosave", "toggle autosave", cxxopts::value<bool>()->default_value("false"))
+        ("Z,autosave", "toggle autosave (-s)", cxxopts::value<bool>()->default_value("false"))
         ("s,save", "save loaded block (if autosave off)")
         ("S,Save", "save buffer to file", cxxopts::value<std::string>());
     options.allow_unrecognised_options();
@@ -56,32 +77,32 @@ int main(int argc, char *argv[])
     }
     catch (std::exception &e)
     {
-        std::cerr << "Invalid argument(s)" << std::endl;
+        fprintf(stderr, "Invalid argument(s)\n");
         exit(1);
     }
 
     if (result.count("help"))
     {
-        std::cout << options.help() << std::endl;
+        printf("%s\n", options.help().c_str());
         exit(0);
     }
 
     if (result.count("version"))
     {
-        std::cout << FGNS_VERSION << std::endl;
+        printf("fgns %s\n%s\n", FGNS_VERSION, LICENSE_TEXT);
         exit(0);
     }
 
     if (result.count("compress"))
     {
         std::string arg = result["compress"].as<std::string>();
-        exit(FGNS::compress_ext(arg));
+        exit(!FGNS::compress_ext(arg));
     }
 
     if (result.count("decompress"))
     {
         std::string arg = result["decompress"].as<std::string>();
-        exit(FGNS::decompress_ext(arg));
+        exit(!FGNS::decompress_ext(arg));
     }
 
     FGNS::Block block;
@@ -108,7 +129,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cerr << "File not found: " << arg << std::endl;
+            fprintf(stderr, "File not found: %s\n", arg.c_str());
             exit(1);
         }
     }
@@ -253,6 +274,10 @@ int main(int argc, char *argv[])
         {
             EXIT_CODE = !FGNS::import(block, arg.value());
         }
+        else if (arg.key() == "importdir")
+        {
+            EXIT_CODE = !FGNS::importdir(block, arg.value());
+        }
         else if (arg.key() == "export")
         {
             std::string dst = arg.value();
@@ -292,9 +317,9 @@ int main(int argc, char *argv[])
         else if (arg.key() == "Save")
         {
             std::string filename = arg.value();
-            if (filename.find(FGNS_BLOCK_EXTENSION) == std::string::npos)
+            if (filename.find(FLAT_BLOCK_EXTENSION) == std::string::npos)
             {
-                filename += FGNS_BLOCK_EXTENSION;
+                filename += FLAT_BLOCK_EXTENSION;
             }
             FGNS::save_bin(block, filename);
         }

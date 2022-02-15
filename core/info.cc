@@ -10,16 +10,16 @@ bool FGNS::info(FGNS::Block &block, std::string dst, int mode)
     {
         FGNS::File &file = *FGNS::get_file_ptr(block, dst, mode);
 
-        std::cout << "Name: " << file.name << std::endl;
-        std::cout << "ID: " << file.ID << std::endl;
-        std::cout << "Size: " << file.content.size() << std::endl;
-        std::cout << "Encrypted: " << file.ENCRYPTED << std::endl;
+        printf("Name: %s\n", file.name.c_str());
+        printf("ID: %u\n", file.ID);
+        printf("Size: %zu\n", file.content.size());
+        printf("Encrypted: %d\n", file.ENCRYPTED);
         
         return true;
     }
     else
     {
-        std::cerr << "File does not exist" << std::endl;
+        fprintf(stderr, "File does not exist\n");
         return false;
     }
 }

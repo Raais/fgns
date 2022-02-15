@@ -37,6 +37,7 @@ namespace FGNS
 File* get_file_ptr(Block &block, std::string dst, int mode = 0);
 std::string root_get_target_fuzzy(Block &block, std::string dst);
 std::string fs_get_target_fuzzy(std::string dst_ext);
+std::string input_sanitizer_special_chars(std::string input);
 bool exists_ext(std::string dst_ext);
 void save_bin(Block &block, std::string dst_ext);
 Block load_bin(std::string dst_ext);

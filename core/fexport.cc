@@ -23,7 +23,7 @@ bool FGNS::fexport(FGNS::Block &block, std::string src, std::string dst_ext, int
     }
     else
     {
-        std::cerr << "File does not exist" << std::endl;
+        fprintf(stderr, "File does not exist\n");
         return false;
     }
 }

@@ -83,6 +83,21 @@ std::string FGNS::fs_get_target_fuzzy(std::string dst_ext)
     return best_match;
 }
 
+std::string FGNS::input_sanitizer_special_chars(std::string input)
+{
+    std::string output = input;
+    if (output.find("/") != std::string::npos)
+    {
+        output = output.substr(output.find_last_of("/") + 1);
+    }
+    std::string special_chars = "\\/:*?^%&`'{}[]=+~!()-_$@#;,\"<>|";
+    for (auto &c : special_chars)
+    {
+        output.erase(std::remove(output.begin(), output.end(), c), output.end());
+    }
+    return output;
+}
+
 bool FGNS::exists_ext(std::string dst_ext)
 {
     std::ifstream f(dst_ext.c_str());
@@ -163,13 +178,13 @@ bool FGNS::compress_ext(std::string dst_ext)
             }
             else
             {
-                std::cerr << "error: File might already be compressed" << std::endl;
+                fprintf(stderr, "File might already be compressed.\n");
                 return false;
             }
         }
         else
         {
-            std::cerr << "File not found" << std::endl;
+            fprintf(stderr, "File does not exist.\n");
             return false;
         }
 }
@@ -196,13 +211,13 @@ bool FGNS::decompress_ext(std::string dst_ext)
             }
             else
             {
-                std::cerr << "error: File might not be compressed" << std::endl;
+                fprintf(stderr, "File might already be decompressed.\n");
                 return false;
             }
         }
         else
         {
-            std::cerr << "File not found" << std::endl;
+            fprintf(stderr, "File does not exist.\n");
             return false;
         }
 }
