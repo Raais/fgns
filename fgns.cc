@@ -11,16 +11,6 @@
 #define FLAT_BLOCK_EXTENSION ".cfb3" // "Cereal"ized flat block (3 is cool))
 #define LICENSE_TEXT "Copyright (c) 2022 Raais N.\n" \
 "\n" \
-"Permission is hereby granted, free of charge, to any person obtaining a copy\n" \
-"of this software and associated documentation files (the \"Software\"), to deal\n" \
-"in the Software without restriction, including without limitation the rights\n" \
-"to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n" \
-"copies of the Software, and to permit persons to whom the Software is\n" \
-"furnished to do so, subject to the following conditions:\n" \
-"\n" \
-"The above copyright notice and this permission notice shall be included in all\n" \
-"copies or substantial portions of the Software.\n" \
-"\n" \
 "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" \
 "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" \
 "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" \
@@ -61,8 +51,8 @@ int main(int argc, char *argv[])
         ("I,importdir", "import external <dstdir_ext>", cxxopts::value<std::string>())
         ("e,export", "(-t <src>) export to <dst_ext>", cxxopts::value<std::string>())
         ("q,exists", "check if <dst> exists", cxxopts::value<std::string>())
-        ("X,compress", "compress block", cxxopts::value<std::string>())
-        ("x,decompress", "decompress block.xz", cxxopts::value<std::string>())
+        ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
+        ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
         ("Z,autosave", "toggle autosave (-s)", cxxopts::value<bool>()->default_value("false"))
         ("s,save", "save loaded block (if autosave off)")
