@@ -2,3 +2,4 @@ build/
 backup/
 .vscode/
 libs/lzma/
+libs/cryptopp/

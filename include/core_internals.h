@@ -43,10 +43,11 @@ void save_bin(Block &block, std::string dst_ext);
 Block load_bin(std::string dst_ext);
 void save_json(Block &block, std::string dst_ext);
 Block load_json(std::string dst_ext);
-void put_fstream_string_bin(std::string path, std::string str);
-std::string get_fstream_string(std::string path);
+void write_ext_bin(std::string path, std::string str);
+std::string read_ext(std::string path);
 bool compress_ext(std::string dst_ext);
 bool decompress_ext(std::string dst_ext);
-
+std::string get_file_magic(std::string dst_ext);
+bool has_suffix(std::string str, std::string suffix);
 
 }

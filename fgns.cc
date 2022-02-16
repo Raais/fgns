@@ -8,7 +8,7 @@
 #include "cxxopts.hpp"
 
 #define FGNS_VERSION         "0.9.1"
-#define FLAT_BLOCK_EXTENSION ".cfb3" // "Cereal"ized flat block (3 is cool))
+#define FLAT_BLOCK_EXTENSION ".cfbo" // "Cereal"ized flat block object
 #define LICENSE_TEXT "Copyright (c) 2022 Raais N.\n" \
 "\n" \
 "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" \
@@ -94,6 +94,14 @@ int main(int argc, char *argv[])
     if (result.count("decompress"))
     {
         std::string arg = result["decompress"].as<std::string>();
+        if(!FGNS::exists_ext(arg))
+        {
+            if(FGNS::exists_ext(arg + ".xz"))
+            {
+                fprintf(stderr, "Did you mean %s.xz ?\n", arg.c_str());
+                exit(1);
+            }
+        }
         exit(!FGNS::decompress_ext(arg));
     }
 
@@ -109,11 +117,16 @@ int main(int argc, char *argv[])
         std::string arg = result["file"].as<std::string>();
         if(FGNS::exists_ext(arg))
         {
-            if(arg.find(".xz") != std::string::npos)
+            if(FGNS::get_file_magic(arg) == "xz")
             {
                 FGNS::decompress_ext(arg);
                 arg.erase(arg.size() - 3, 3);
                 compressed = true;
+            }
+            else if(FGNS::get_file_magic(arg) != "fgnsflat")
+            {
+                fprintf(stderr, "Invalid or corrupted file\n");
+                exit(1);
             }
             block = FGNS::load_bin(arg);
             loaded = true;
@@ -309,10 +322,9 @@ int main(int argc, char *argv[])
         else if (arg.key() == "Save")
         {
             std::string filename = arg.value();
-            if (filename.find(FLAT_BLOCK_EXTENSION) == std::string::npos)
-            {
+            if (!FGNS::has_suffix(filename, FLAT_BLOCK_EXTENSION))
                 filename += FLAT_BLOCK_EXTENSION;
-            }
+
             FGNS::save_bin(block, filename);
         }
     }

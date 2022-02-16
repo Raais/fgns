@@ -14,7 +14,7 @@ bool FGNS::importdir(FGNS::Block &block, std::string dstdir_ext)
                         std::string filename = it->path().string();
                         filename = FGNS::input_sanitizer_special_chars(filename);
                         FGNS::touch(block, filename);
-                        FGNS::write(block, filename, FGNS::get_fstream_string(it->path().string()));
+                        FGNS::write(block, filename, FGNS::read_ext(it->path().string()));
                     }
                 }
 
@@ -37,7 +37,7 @@ bool FGNS::importdir(FGNS::Block &block, std::string dstdir_ext)
                         std::string filename = it->path().string();
                         filename = FGNS::input_sanitizer_special_chars(filename);
                         FGNS::touch(block, filename);
-                        FGNS::write(block, filename, FGNS::get_fstream_string(it->path().string()));
+                        FGNS::write(block, filename, FGNS::read_ext(it->path().string()));
                     }
                 }
 

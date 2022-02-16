@@ -107,6 +107,8 @@ bool FGNS::exists_ext(std::string dst_ext)
 void FGNS::save_bin(FGNS::Block &block, std::string dst_ext)
 {
     std::ofstream file(dst_ext, std::ios::binary);
+    unsigned char magic[] = {0xDE, 0x90, 0xDE, 0x83, 0x66, 0x67, 0x6E, 0x73};
+    file.write((char*)magic, 8);
     cereal::BinaryOutputArchive archive(file);
     archive(CEREAL_NVP(block));
     file.close();
@@ -117,6 +119,7 @@ FGNS::Block FGNS::load_bin(std::string dst_ext)
 {
     FGNS::Block block;
     std::ifstream file(dst_ext, std::ios::binary);
+    file.seekg(8, std::ios::beg);
     cereal::BinaryInputArchive archive(file);
     archive(CEREAL_NVP(block));
     file.close();
@@ -141,14 +144,14 @@ FGNS::Block FGNS::load_json(std::string dst_ext)
     return block;
 }
 
-void FGNS::put_fstream_string_bin(std::string path, std::string str)
+void FGNS::write_ext_bin(std::string path, std::string str)
 {
     std::ofstream ofs(path, std::ios::out | std::ios::binary | std::ios::trunc);
     ofs.write(str.c_str(), str.size());
     ofs.close();
 }
 
-std::string FGNS::get_fstream_string(std::string path)
+std::string FGNS::read_ext(std::string path)
 {
     std::ifstream f(path.c_str());
     std::string content((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
@@ -160,18 +163,18 @@ bool FGNS::compress_ext(std::string dst_ext)
 {
     if(FGNS::exists_ext(dst_ext))
         {
-            if(dst_ext.find(".xz") == std::string::npos)
+            if(FGNS::get_file_magic(dst_ext) != "xz")
             {
                 std::string out = dst_ext + ".xz";
 
                 std::stringstream uncompressed;
                 std::stringstream compressed;
 
-                uncompressed << FGNS::get_fstream_string(dst_ext);
+                uncompressed << FGNS::read_ext(dst_ext);
 
                 xz::compress(uncompressed, compressed);
 
-                FGNS::put_fstream_string_bin(out, compressed.str());
+                FGNS::write_ext_bin(out, compressed.str());
                 fs::remove(dst_ext);
 
                 return true;
@@ -193,18 +196,20 @@ bool FGNS::decompress_ext(std::string dst_ext)
 {
     if(FGNS::exists_ext(dst_ext))
         {
-            if(dst_ext.find(".xz") != std::string::npos)
+            if(FGNS::get_file_magic(dst_ext) == "xz")
             {
-                std::string out = dst_ext.substr(0, dst_ext.size() - 3);
+                std::string out = dst_ext;
+                if(FGNS::has_suffix(out, ".xz"))
+                    out.erase(out.size() - 3, 3);
 
                 std::stringstream uncompressed;
                 std::stringstream compressed;
 
-                compressed << FGNS::get_fstream_string(dst_ext);
+                compressed << FGNS::read_ext(dst_ext);
 
                 xz::decompress(compressed, uncompressed);
 
-                FGNS::put_fstream_string_bin(out, uncompressed.str());
+                FGNS::write_ext_bin(out, uncompressed.str());
                 fs::remove(dst_ext);
 
                 return true;
@@ -220,4 +225,9 @@ bool FGNS::decompress_ext(std::string dst_ext)
             fprintf(stderr, "File does not exist.\n");
             return false;
         }
+}
+
+bool FGNS::has_suffix(std::string str, std::string suffix)
+{
+    return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
