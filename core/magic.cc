@@ -2,7 +2,7 @@
 
 std::string FGNS::get_file_magic(std::string dst_ext)
 {
-    std::string = "";
+    std::string content = "";
     std::string magic = "";
 
     if (!FGNS::exists_ext(dst_ext))
