@@ -2,13 +2,14 @@
 #include <string>
 #include <vector>
 
-#include "core_types.h"
-#include "core_utils.h"
+#include "flat.h"
+#include "flat_utils.h"
+//#include "tree.h"
+//#include "tree_utils.h"
 
 #include "cxxopts.hpp"
 
 #define FGNS_VERSION         "0.9.1"
-#define FLAT_BLOCK_EXTENSION ".cfbo" // "Cereal"ized flat block object //
 #define LICENSE_TEXT "Copyright (c) 2022 Raais N.\n" \
 "\n" \
 "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" \
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
         exit(!FGNS::decompress_ext(arg));
     }
 
-    FGNS::Block block;
+    FGNS::FlatBlock block;
 
     std::string src;
     bool compressed = false;

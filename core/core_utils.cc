@@ -1,9 +1,9 @@
-#include "core_internals.h"
+#include "core_utils.h"
 
-FGNS::File* FGNS::get_file_ptr(FGNS::Block &block, std::string dst, int mode)
+FGNS::File* FGNS::get_file_ptr(std::vector<FGNS::File> &root, std::string dst, int mode)
 {
     std::string q;
-    for (auto &file : block.root)
+    for (auto &file : root)
     {
         (mode == 0) ? q = file.name : q = std::to_string(file.ID);
         
@@ -13,7 +13,7 @@ FGNS::File* FGNS::get_file_ptr(FGNS::Block &block, std::string dst, int mode)
     return nullptr;
 }
 
-std::string FGNS::root_get_target_fuzzy(FGNS::Block &block, std::string dst)
+std::string FGNS::root_get_target_fuzzy(std::vector<FGNS::File> &root, std::string dst)
 {
     if (dst.back() == '*')
         dst.pop_back();
@@ -24,7 +24,7 @@ std::string FGNS::root_get_target_fuzzy(FGNS::Block &block, std::string dst)
 
     auto scorer = rapidfuzz::fuzz::CachedRatio<std::string>(dst);
 
-    for (auto &file : block.root)
+    for (auto &file : root)
     {
         double score = scorer.ratio(file.name, best_score);
         if (score >= best_score)
@@ -93,46 +93,6 @@ bool FGNS::exists_ext(std::string dst_ext)
 {
     std::ifstream f(dst_ext.c_str());
     return f.good();
-}
-
-void FGNS::save_bin(FGNS::Block &block, std::string dst_ext)
-{
-    std::ofstream file(dst_ext, std::ios::binary);
-    unsigned char magic[] = {0xDE, 0x90, 0xDE, 0x83, 0x66, 0x67, 0x6E, 0x73};
-    file.write((char*)magic, 8);
-    cereal::BinaryOutputArchive archive(file);
-    archive(CEREAL_NVP(block));
-    file.close();
-}
-
-
-FGNS::Block FGNS::load_bin(std::string dst_ext)
-{
-    FGNS::Block block;
-    std::ifstream file(dst_ext, std::ios::binary);
-    file.seekg(8, std::ios::beg);
-    cereal::BinaryInputArchive archive(file);
-    archive(CEREAL_NVP(block));
-    file.close();
-    return block;
-}
-
-void FGNS::save_json(FGNS::Block &block, std::string dst_ext)
-{
-    std::ofstream file(dst_ext);
-    cereal::JSONOutputArchive archive(file);
-    archive(CEREAL_NVP(block));
-    file.close();
-}
-
-FGNS::Block FGNS::load_json(std::string dst_ext)
-{
-    FGNS::Block block;
-    std::ifstream file(dst_ext);
-    cereal::JSONInputArchive archive(file);
-    archive(CEREAL_NVP(block));
-    file.close();
-    return block;
 }
 
 void FGNS::write_ext_bin(std::string path, std::string str)

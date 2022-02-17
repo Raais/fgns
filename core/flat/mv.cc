@@ -1,10 +1,10 @@
-#include "core_utils.h"
+#include "flat_utils.h"
 
-bool FGNS::mv(FGNS::Block &block, std::string src, std::string dst, int mode)
+bool FGNS::mv(FGNS::FlatBlock &block, std::string src, std::string dst, int mode)
 {
     dst = FGNS::input_sanitizer_special_chars(dst);
     if ((mode == 0) && (src.back() == '*'))
-        src = FGNS::root_get_target_fuzzy(block, src);
+        src = FGNS::root_get_target_fuzzy(block.root, src);
     
     if (!FGNS::exists(block, src, mode))
     {
@@ -18,7 +18,7 @@ bool FGNS::mv(FGNS::Block &block, std::string src, std::string dst, int mode)
     }
     else
     {
-        FGNS::File &source = *FGNS::get_file_ptr(block, src, mode);
+        FGNS::File &source = *FGNS::get_file_ptr(block.root, src, mode);
 
         source.TIMESTAMP = (unsigned int)std::time(NULL);
         source.name = dst;

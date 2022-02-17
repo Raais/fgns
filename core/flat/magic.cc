@@ -1,4 +1,4 @@
-#include "core_internals.h"
+#include "core_utils.h"
 
 std::string FGNS::get_file_magic(std::string dst_ext)
 {

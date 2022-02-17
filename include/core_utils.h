@@ -1,29 +1,51 @@
 #pragma once
 
-#include <cstdio>
+#ifdef __APPLE__
+#include <Availability.h>
+#endif
+#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || (defined(__cplusplus) && __cplusplus >= 201703L)) && defined(__has_include)
+#if __has_include(<filesystem>) && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500)
+#define GHC_USE_STD_FS
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+#endif
+#ifndef GHC_USE_STD_FS
+#include <ghc/filesystem.hpp>
+namespace fs = ghc::filesystem;
+#endif
+
 #include <string>
-#include <vector>
 #include <fstream>
-#include <iomanip>
+#include <sstream>
+
+#include <rapidfuzz/fuzz.hpp>
+using rapidfuzz::fuzz::ratio;
+
+#include "encode.hpp"
+#include "decode.hpp"
 
 #include "core_types.h"
-#include "core_internals.h"
-#include "str_crypto.h"
 
 namespace FGNS
 {
-    void   ls        (Block &block);
-    bool   touch     (Block &block, std::string dst);
-    bool   rm        (Block &block, std::string dst,                       int mode = 0);
-    bool   cat       (Block &block, std::string dst,                       int mode = 0);
-    bool   info      (Block &block, std::string dst,                       int mode = 0);
-    bool   exists    (Block &block, std::string dst,                       int mode = 0);
-    bool   cp        (Block &block, std::string src, std::string dst,      int mode = 0);
-    bool   mv        (Block &block, std::string src, std::string dst,      int mode = 0);
-    bool   write     (Block &block, std::string dst, std::string content,  int mode = 0);
-    bool   encrypt   (Block &block, std::string dst, std::string password, int mode = 0);
-    bool   decrypt   (Block &block, std::string dst, std::string password, int mode = 0);
-    bool   fexport   (Block &block, std::string src, std::string dst_ext,  int mode = 0);
-    bool   import    (Block &block, std::string dst_ext);
-    bool   importdir (Block &block, std::string dstdir_ext);
+          File* get_file_ptr (std::vector<File> &root, std::string dst, int mode = 0);
+
+    std::string root_get_target_fuzzy (std::vector<File> &root, std::string dst);
+
+    std::string fs_get_target_fuzzy (std::string dst_ext);
+
+    std::string input_sanitizer_special_chars (std::string input);
+
+           bool exists_ext (std::string dst_ext);
+
+           void write_ext_bin (std::string path, std::string str);
+    std::string read_ext (std::string path);
+
+           bool compress_ext (std::string dst_ext);
+           bool decompress_ext (std::string dst_ext);
+
+    std::string get_file_magic (std::string dst_ext);
+
+           bool has_suffix (std::string str, std::string suffix);
 }

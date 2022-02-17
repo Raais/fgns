@@ -1,6 +1,6 @@
-#include "core_utils.h"
+#include "flat_utils.h"
 
-bool FGNS::importdir(FGNS::Block &block, std::string dstdir_ext)
+bool FGNS::importdir(FGNS::FlatBlock &block, std::string dstdir_ext)
 {
     if (dstdir_ext.back() == '%')
     {

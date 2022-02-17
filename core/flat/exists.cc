@@ -1,6 +1,6 @@
-#include "core_utils.h"
+#include "flat_utils.h"
 
-bool FGNS::exists(FGNS::Block &block, std::string dst, int mode)
+bool FGNS::exists(FGNS::FlatBlock &block, std::string dst, int mode)
 {
     std::string q;
     for (auto &file : block.root)

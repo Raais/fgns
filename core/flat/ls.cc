@@ -1,6 +1,6 @@
-#include "core_utils.h"
+#include "flat_utils.h"
 
-void FGNS::ls(FGNS::Block &block)
+void FGNS::ls(FGNS::FlatBlock &block)
 {
     for (auto &file : block.root)
     {

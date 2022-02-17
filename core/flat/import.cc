@@ -1,6 +1,6 @@
-#include "core_utils.h"
+#include "flat_utils.h"
 
-bool FGNS::import(FGNS::Block &block, std::string dst_ext)
+bool FGNS::import(FGNS::FlatBlock &block, std::string dst_ext)
 {
     if (dst_ext.back() == '*')
         dst_ext = FGNS::fs_get_target_fuzzy(dst_ext);

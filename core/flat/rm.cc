@@ -1,6 +1,6 @@
-#include "core_utils.h"
+#include "flat_utils.h"
 
-bool FGNS::rm(FGNS::Block &block, std::string dst, int mode)
+bool FGNS::rm(FGNS::FlatBlock &block, std::string dst, int mode)
 {
     if(FGNS::exists(block, dst, mode))
     {

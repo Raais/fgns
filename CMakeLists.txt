@@ -16,12 +16,11 @@ set(LIBS_DIR ${CMAKE_SOURCE_DIR}/libs)
 #add_subdirectory(${THIRD_PARTY_DIR}/cryptopp)
 add_subdirectory(${THIRD_PARTY_DIR}/rapidfuzz)
 
-file(GLOB_RECURSE SOURCE_DIR_GLOB ${CMAKE_SOURCE_DIR}/*.cc)
 file(GLOB_RECURSE CORE_DIR_GLOB ${CORE_DIR}/*.cc)
 file(GLOB_RECURSE CRYPTO_DIR_GLOB ${CRYPTO_DIR}/*.cc)
 file(GLOB_RECURSE XZ_DIR_GLOB ${XZ_DIR}/*.cpp)
 
-set(SOURCE_FILES ${SOURCE_DIR_GLOB}
+set(SOURCE_FILES ${CMAKE_SOURCE_DIR}/fgns.cc
                     ${CORE_DIR_GLOB}
                         ${CRYPTO_DIR_GLOB}
                               ${XZ_DIR_GLOB})
@@ -36,7 +35,6 @@ target_include_directories(fgns PRIVATE ${CMAKE_SOURCE_DIR}/include
                                        #${LIBS_DIR}/lzma/include
                                        #${LIBS_DIR}/lzma/include/lzma
                                        ${THIRD_PARTY_DIR}/cereal/include
-                                       ${THIRD_PARTY_DIR}/termcolor
                                        ${THIRD_PARTY_DIR}/cxxopts
                                        ${THIRD_PARTY_DIR}/filesystem/include
                                        )

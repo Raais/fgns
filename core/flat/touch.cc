@@ -1,6 +1,6 @@
-#include "core_utils.h"
+#include "flat_utils.h"
 
-bool FGNS::touch(FGNS::Block &block, std::string dst)
+bool FGNS::touch(FGNS::FlatBlock &block, std::string dst)
 {
     dst = FGNS::input_sanitizer_special_chars(dst);
     
