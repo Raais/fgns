@@ -11,7 +11,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 
-#include "flat.h"
+#include "flat_block.h"
 #include "core_utils.h"
 #include "str_crypto.h"
 

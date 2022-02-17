@@ -3,9 +3,7 @@
 #include <vector>
 
 #include "flat.h"
-#include "flat_utils.h"
 //#include "tree.h"
-//#include "tree_utils.h"
 
 #include "cxxopts.hpp"
 
