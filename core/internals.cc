@@ -8,9 +8,7 @@ FGNS::File* FGNS::get_file_ptr(FGNS::Block &block, std::string dst, int mode)
         (mode == 0) ? q = file.name : q = std::to_string(file.ID);
         
         if (q == dst)
-        {
             return &file;
-        }
     }
     return nullptr;
 }
@@ -18,9 +16,7 @@ FGNS::File* FGNS::get_file_ptr(FGNS::Block &block, std::string dst, int mode)
 std::string FGNS::root_get_target_fuzzy(FGNS::Block &block, std::string dst)
 {
     if (dst.back() == '*')
-    {
         dst.pop_back();
-    }
 
     bool match_found = false;
     double best_score = 0.0;
@@ -40,9 +36,7 @@ std::string FGNS::root_get_target_fuzzy(FGNS::Block &block, std::string dst)
     }
 
     if (!match_found)
-    {
         return "";
-    }
 
     return best_match;
 }
@@ -50,9 +44,7 @@ std::string FGNS::root_get_target_fuzzy(FGNS::Block &block, std::string dst)
 std::string FGNS::fs_get_target_fuzzy(std::string dst_ext)
 {
     if (dst_ext.back() == '*')
-    {
         dst_ext.pop_back();
-    }
 
     bool match_found = false;
     double best_score = 0.0;
@@ -76,9 +68,7 @@ std::string FGNS::fs_get_target_fuzzy(std::string dst_ext)
     }
 
     if (!match_found)
-    {
         return "";
-    }
 
     return best_match;
 }
@@ -86,15 +76,16 @@ std::string FGNS::fs_get_target_fuzzy(std::string dst_ext)
 std::string FGNS::input_sanitizer_special_chars(std::string input)
 {
     std::string output = input;
+
     if (output.find("/") != std::string::npos)
-    {
         output = output.substr(output.find_last_of("/") + 1);
-    }
+
     std::string special_chars = "\\/:*?^%&`'{}[]=+~!()-_$@#;,\"<>|";
     for (auto &c : special_chars)
     {
         output.erase(std::remove(output.begin(), output.end(), c), output.end());
     }
+
     return output;
 }
 
@@ -161,9 +152,9 @@ std::string FGNS::read_ext(std::string path)
 
 bool FGNS::compress_ext(std::string dst_ext)
 {
-    if(FGNS::exists_ext(dst_ext))
+    if (FGNS::exists_ext(dst_ext))
         {
-            if(FGNS::get_file_magic(dst_ext) != "xz")
+            if (FGNS::get_file_magic(dst_ext) != "xz")
             {
                 std::string out = dst_ext + ".xz";
 
@@ -194,12 +185,12 @@ bool FGNS::compress_ext(std::string dst_ext)
 
 bool FGNS::decompress_ext(std::string dst_ext)
 {
-    if(FGNS::exists_ext(dst_ext))
+    if (FGNS::exists_ext(dst_ext))
         {
-            if(FGNS::get_file_magic(dst_ext) == "xz")
+            if (FGNS::get_file_magic(dst_ext) == "xz")
             {
                 std::string out = dst_ext;
-                if(FGNS::has_suffix(out, ".xz"))
+                if (FGNS::has_suffix(out, ".xz"))
                     out.erase(out.size() - 3, 3);
 
                 std::stringstream uncompressed;
