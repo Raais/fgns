@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
         ("Z,autosave", "toggle autosave (-s)", cxxopts::value<bool>()->default_value("false"))
         ("s,save", "save loaded block (if autosave off)")
-        ("S,Save", "save buffer to file", cxxopts::value<std::string>());
+        ("S,Save", "save buffer to <FILE> / create new empty <FILE>", cxxopts::value<std::string>());
     options.allow_unrecognised_options();
 
     cxxopts::ParseResult result;
