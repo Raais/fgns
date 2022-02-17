@@ -4,9 +4,8 @@ bool FGNS::cp(FGNS::Block &block, std::string src, std::string dst, int mode)
 {
     dst = FGNS::input_sanitizer_special_chars(dst);
     if ((mode == 0) && (src.back() == '*'))
-    {
         src = FGNS::root_get_target_fuzzy(block, src);
-    }
+        
     if (!FGNS::exists(block, src, mode))
     {
         fprintf(stderr, "File does not exist\n");

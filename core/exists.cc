@@ -8,9 +8,7 @@ bool FGNS::exists(FGNS::Block &block, std::string dst, int mode)
         (mode == 0) ? q = file.name : q = std::to_string(file.ID);
         
         if (q == dst)
-        {
             return true;
-        }
     }
     return false;
 }

@@ -8,7 +8,7 @@
 #include "cxxopts.hpp"
 
 #define FGNS_VERSION         "0.9.1"
-#define FLAT_BLOCK_EXTENSION ".cfbo" // "Cereal"ized flat block object
+#define FLAT_BLOCK_EXTENSION ".cfbo" // "Cereal"ized flat block object //
 #define LICENSE_TEXT "Copyright (c) 2022 Raais N.\n" \
 "\n" \
 "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" \
@@ -23,12 +23,6 @@
 int main(int argc, char *argv[])
 {
     int EXIT_CODE = 0;
-    
-    std::vector<std::string> args;
-    for (int i = 1; i < argc; i++)
-    {
-        args.push_back(argv[i]);
-    }
 
     cxxopts::Options options("fgns", "fgns - virtual file system");
 
@@ -63,10 +57,7 @@ int main(int argc, char *argv[])
 
     cxxopts::ParseResult result;
 
-    try
-    {
-        result = options.parse(argc, argv);
-    }
+    try { result = options.parse(argc, argv); }
     catch (std::exception &e)
     {
         fprintf(stderr, "Invalid argument(s)\n");
@@ -94,14 +85,12 @@ int main(int argc, char *argv[])
     if (result.count("decompress"))
     {
         std::string arg = result["decompress"].as<std::string>();
-        if(!FGNS::exists_ext(arg))
-        {
-            if(FGNS::exists_ext(arg + ".xz"))
+        if (!FGNS::exists_ext(arg))
+            if (FGNS::exists_ext(arg + ".xz"))
             {
                 fprintf(stderr, "Did you mean %s.xz ?\n", arg.c_str());
                 exit(1);
             }
-        }
         exit(!FGNS::decompress_ext(arg));
     }
 
@@ -115,15 +104,15 @@ int main(int argc, char *argv[])
     if (result.count("file"))
     {
         std::string arg = result["file"].as<std::string>();
-        if(FGNS::exists_ext(arg))
+        if (FGNS::exists_ext(arg))
         {
-            if(FGNS::get_file_magic(arg) == "xz")
+            if (FGNS::get_file_magic(arg) == "xz")
             {
                 FGNS::decompress_ext(arg);
                 arg.erase(arg.size() - 3, 3);
                 compressed = true;
             }
-            else if(FGNS::get_file_magic(arg) != "fgnsflat")
+            else if (FGNS::get_file_magic(arg) != "fgnsflat")
             {
                 fprintf(stderr, "Invalid or corrupted file\n");
                 exit(1);
@@ -142,9 +131,7 @@ int main(int argc, char *argv[])
     if (loaded)
     {
         if (result.count("autosave"))
-        {
             block.AUTOSAVE = !block.AUTOSAVE;
-        }
     }
 
     if (result.count("jsondump"))
@@ -157,17 +144,14 @@ int main(int argc, char *argv[])
     for (auto &arg : result.arguments())
     {
         if (arg.key() == "target")
-        {
             src = arg.value();
-        }
+
         else if (arg.key() == "ls")
-        {
             FGNS::ls(block);
-        }
+
         else if (arg.key() == "touch")
-        {
             EXIT_CODE = !FGNS::touch(block, arg.value());
-        }
+
         else if (arg.key() == "rm")
         {
             std::string dst = arg.value();
@@ -177,10 +161,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::rm(block, dst, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::rm(block, dst);
-            }
         }
+
         else if (arg.key() == "cp")
         {
             std::string dst = arg.value();
@@ -190,10 +173,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::cp(block, src, dst, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::cp(block, src, dst);
-            }
         }
+
         else if (arg.key() == "mv")
         {
             std::string dst = arg.value();
@@ -203,10 +185,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::mv(block, src, dst, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::mv(block, src, dst);
-            }
         }
+
         else if (arg.key() == "cat")
         {
             std::string dst = arg.value();
@@ -216,10 +197,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::cat(block, dst, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::cat(block, dst);
-            }
         }
+
         else if (arg.key() == "write")
         {
             std::string dst = src;
@@ -230,10 +210,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::write(block, dst, content, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::write(block, dst, content);
-            }
         }
+
         else if (arg.key() == "info")
         {
             std::string dst = arg.value();
@@ -243,10 +222,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::info(block, dst, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::info(block, dst);
-            }
         }
+
         else if (arg.key() == "encrypt")
         {
             std::string dst = src;
@@ -257,10 +235,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::encrypt(block, dst, password, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::encrypt(block, dst, password);
-            }
         }
+
         else if (arg.key() == "decrypt")
         {
             std::string dst = src;
@@ -271,18 +248,15 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::decrypt(block, dst, password, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::decrypt(block, dst, password);
-            }
         }
+
         else if (arg.key() == "import")
-        {
             EXIT_CODE = !FGNS::import(block, arg.value());
-        }
+
         else if (arg.key() == "importdir")
-        {
             EXIT_CODE = !FGNS::importdir(block, arg.value());
-        }
+
         else if (arg.key() == "export")
         {
             std::string dst = arg.value();
@@ -292,10 +266,9 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::fexport(block, src, dst, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::fexport(block, src, dst);
-            }
         }
+
         else if (arg.key() == "exists")
         {
             std::string dst = arg.value();
@@ -305,20 +278,16 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::exists(block, dst, 1);
             }
             else
-            {
                 EXIT_CODE = !FGNS::exists(block, dst);
-            }
         }
+
         else if (arg.key() == "save")
         {
             if (loaded)
-            {
                 if (!block.AUTOSAVE)
-                {
                     FGNS::save_bin(block, loaded_file);
-                }
-            }
         }
+
         else if (arg.key() == "Save")
         {
             std::string filename = arg.value();
@@ -332,13 +301,9 @@ int main(int argc, char *argv[])
     if (loaded)
     {
         if (block.AUTOSAVE)
-        {
             FGNS::save_bin(block, loaded_file);
-        }
         if (compressed)
-        {
             FGNS::compress_ext(loaded_file);
-        }
     }
 
     return EXIT_CODE;
