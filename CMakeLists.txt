@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-Os")
+set(CMAKE_CXX_FLAGS_RELEASE "-s -Os")
 
 project(fgns)
 
@@ -13,7 +13,7 @@ set(CRYPTO_DIR ${CMAKE_SOURCE_DIR}/crypto)
 set(XZ_DIR ${CMAKE_SOURCE_DIR}/xz)
 set(LIBS_DIR ${CMAKE_SOURCE_DIR}/libs)
 
-#add_subdirectory(${THIRD_PARTY_DIR}/cryptopp)
+add_subdirectory(${THIRD_PARTY_DIR}/cryptopp)
 add_subdirectory(${THIRD_PARTY_DIR}/rapidfuzz)
 
 file(GLOB_RECURSE CORE_DIR_GLOB ${CORE_DIR}/*.cc)
@@ -39,9 +39,9 @@ target_include_directories(fgns PRIVATE ${CMAKE_SOURCE_DIR}/include
                                        ${THIRD_PARTY_DIR}/filesystem/include
                                        )
 
-#target_link_libraries(fgns -static rapidfuzz::rapidfuzz S{LIBS_DIR}/cryptopp/bin/libcryptopp.a ${LIBS_DIR}/lzma/bin/linux/release/liblzma.a)
-target_link_libraries(fgns rapidfuzz::rapidfuzz ${LIBS_DIR}/cryptopp/bin/libcryptopp.a ${LIBLZMA_LIBRARIES})
-#target_link_libraries(fgns rapidfuzz::rapidfuzz cryptopp-static ${LIBLZMA_LIBRARIES})
+#target_link_libraries(fgns -static rapidfuzz::rapidfuzz ${LIBS_DIR}/cryptopp/bin/libcryptopp.a ${LIBS_DIR}/lzma/bin/linux/release/liblzma.a)
+#target_link_libraries(fgns rapidfuzz::rapidfuzz ${LIBS_DIR}/cryptopp/bin/libcryptopp.a ${LIBLZMA_LIBRARIES})
+target_link_libraries(fgns rapidfuzz::rapidfuzz cryptopp-static ${LIBLZMA_LIBRARIES})
 
 set(INSTALL_DIR /usr/local/bin)
 install(TARGETS fgns DESTINATION ${INSTALL_DIR})

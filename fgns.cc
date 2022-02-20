@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     options.add_options()
         ("h,help", "print usage")
         ("v,version", "print version")
-        ("f,file", "mount block <FILE>", cxxopts::value<std::string>())
+        ("f,mount", "mount block <FILE>", cxxopts::value<std::string>())
         ("t,target", "positional argument (-t <src> -...)", cxxopts::value<std::string>())
         ("l,ls", "print root")
         ("n,touch", "create <dst>", cxxopts::value<std::string>())
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
         ("Z,autosave", "toggle autosave (-s)", cxxopts::value<bool>()->default_value("false"))
-        ("s,save", "save loaded block (if autosave off)")
+        ("s,save", "save mounted block (if autosave off)")
         ("S,Save", "save buffer to <FILE> / create new empty <FILE>", cxxopts::value<std::string>());
     options.allow_unrecognised_options();
 
@@ -97,12 +97,12 @@ int main(int argc, char *argv[])
 
     std::string src;
     bool compressed = false;
-    bool loaded = false;
-    std::string loaded_file;
+    bool mounted = false;
+    std::string mounted_file;
 
-    if (result.count("file"))
+    if (result.count("mount"))
     {
-        std::string arg = result["file"].as<std::string>();
+        std::string arg = result["mount"].as<std::string>();
         if (FGNS::exists_ext(arg))
         {
             if (FGNS::get_file_magic(arg) == "xz")
@@ -117,8 +117,8 @@ int main(int argc, char *argv[])
                 exit(1);
             }
             block = FGNS::load_bin(arg);
-            loaded = true;
-            loaded_file = arg;
+            mounted = true;
+            mounted_file = arg;
         }
         else
         {
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (loaded)
+    if (mounted)
     {
         if (result.count("autosave"))
             block.AUTOSAVE = !block.AUTOSAVE;
@@ -282,9 +282,9 @@ int main(int argc, char *argv[])
 
         else if (arg.key() == "save")
         {
-            if (loaded)
+            if (mounted)
                 if (!block.AUTOSAVE)
-                    FGNS::save_bin(block, loaded_file);
+                    FGNS::save_bin(block, mounted_file);
         }
 
         else if (arg.key() == "Save")
@@ -297,12 +297,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (loaded)
+    if (mounted)
     {
         if (block.AUTOSAVE)
-            FGNS::save_bin(block, loaded_file);
+            FGNS::save_bin(block, mounted_file);
         if (compressed)
-            FGNS::compress_ext(loaded_file);
+            FGNS::compress_ext(mounted_file);
     }
 
     return EXIT_CODE;
