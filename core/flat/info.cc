@@ -13,6 +13,7 @@ bool FGNS::info(FGNS::FlatBlock &block, std::string dst, int mode)
         printf("ID: %u\n", file.ID);
         printf("Size: %zu\n", file.content.size());
         printf("Encrypted: %d\n", file.ENCRYPTED);
+        printf("Timestamp: %u\n", file.TIMESTAMP);
         
         return true;
     }

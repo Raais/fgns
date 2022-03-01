@@ -7,7 +7,7 @@
 
 #include "cxxopts.hpp"
 
-#define FGNS_VERSION         "0.9.1"
+#define FGNS_VERSION "0.9.2"
 #define LICENSE_TEXT "Copyright (c) 2022 Raais N.\n" \
 "\n" \
 "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" \
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
                         "find <expr> -type f -exec fgns -f <FILE> -i {} \\;",\
          cxxopts::value<std::string>())
         ("e,export", "(-t <src>) export to <dst_ext>", cxxopts::value<std::string>())
-        ("q,exists", "check if <dst> exists", cxxopts::value<std::string>())
+        ("q,exists", "check if <dst> exists and return 0/1", cxxopts::value<std::string>())
         ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
@@ -65,7 +65,13 @@ int main(int argc, char *argv[])
 
     if (result.count("help"))
     {
-        printf("%s\n", options.help().c_str());
+        printf("%s\n\n"\
+        "Commands can be repeated and will be executed in order.\n"\
+        "Append asterisk (*) to a query to get fuzzy/closest match.\n"\
+            "\tEg. \"--cat paswrod.txt*\" -> password.txt\n"\
+        "\"@id\" can also be used in a query instead of the filename.\n"\
+            "\tEg. \"--rm @0\" -> deleted [0] - cat.png\n",\
+        options.help().c_str());
         exit(0);
     }
 
