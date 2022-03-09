@@ -49,7 +49,9 @@ int main(int argc, char *argv[])
         ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
-        ("Z,autosave", "toggle autosave (-s)", cxxopts::value<bool>()->default_value("false"))
+        ("Z,autosave", "toggle autosave (-s)\n"\
+                       "blocks will be autosaved by default",\ 
+         cxxopts::value<bool>()->default_value("false"))
         ("s,save", "save mounted block (if autosave off)")
         ("S,Save", "save buffer to <FILE> / create new empty <FILE>", cxxopts::value<std::string>());
     options.allow_unrecognised_options();
