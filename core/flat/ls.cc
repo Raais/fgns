@@ -16,17 +16,40 @@ void FGNS::Flat::ls(FGNS::Flat::Block &block)
         FGNS::Flat::File &file = *fileptr;
 
         std::string preview;
-        if (file.content.size() > 20)
+
+        if (file.DIRECTORY)
         {
-            preview = file.content.substr(0, 20);
-            preview += "(...)";
+            for (auto &f : file.files)
+            {
+                preview += "[" + std::to_string(f) + "]";
+            }
+            for (auto &d : file.directories)
+            {
+                preview += "[" + std::to_string(d) + "]";
+            }
+            if (preview.size() > 20)
+            {
+                preview = preview.substr(0, 20) + "(...)";
+            }
+
+            printf("[%u] - %u - --- - \033[1;34m%s\033[0m (%zud,%zuf) -> %s\n",
+                file.ID, file.TIMESTAMP, file.NAME.c_str(), file.directories.size(), file.files.size(), preview.c_str());
         }
         else
         {
-            preview = file.content;
+            
+            if (file.content.size() > 20)
+            {
+                preview = file.content.substr(0, 20) + "(...)";
+            }
+            else
+            {
+                preview = file.content;
+            }
+
+            printf("[%u] - %u - $=%d - \033[33m%s\033[0m (%zuB) -> \"%s\"\n",
+                file.ID, file.TIMESTAMP, file.ENCRYPTED, file.NAME.c_str(), file.content.size(), preview.c_str());
         }
 
-        printf("[%u] -- %u -- $=%d -- \033[1;34m%s\033[0m (%zu) -> \"%s\"\n",
-                file.ID, file.TIMESTAMP, file.ENCRYPTED, file.NAME.c_str(), file.content.size(), preview.c_str());
     }
 }

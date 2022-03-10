@@ -26,6 +26,7 @@ FGNS::Flat::File* FGNS::Flat::get_file_ptr(std::vector<FGNS::Flat::File*> &root,
     return nullptr;
 }
 
+/* ID is searched globally in root; Name search is confined to working dir; */
 FGNS::Flat::File& FGNS::Flat::get_file_wrapper(FGNS::Flat::Block &block, std::string dst, int mode)
 {
     FGNS::Flat::File* f = nullptr;
