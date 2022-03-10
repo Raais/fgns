@@ -9,7 +9,7 @@ bool FGNS::fexport(FGNS::FlatBlock &block, std::string src, std::string dst_ext,
     {
         FGNS::File &file = *FGNS::get_file_ptr(block.root, src, mode);
         if (dst_ext == "")
-            dst_ext = file.name;
+            dst_ext = file.NAME;
 
         std::ofstream outfile(dst_ext, std::ios::out | std::ios::binary | std::ios::trunc);
         outfile.write(file.content.c_str(), file.content.size());

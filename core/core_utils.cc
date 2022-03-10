@@ -1,46 +1,5 @@
 #include "core_utils.h"
 
-FGNS::File* FGNS::get_file_ptr(std::vector<FGNS::File> &root, std::string dst, int mode)
-{
-    std::string q;
-    for (auto &file : root)
-    {
-        (mode == 0) ? q = file.name : q = std::to_string(file.ID);
-        
-        if (q == dst)
-            return &file;
-    }
-    return nullptr;
-}
-
-std::string FGNS::root_get_target_fuzzy(std::vector<FGNS::File> &root, std::string dst)
-{
-    if (dst.back() == '*')
-        dst.pop_back();
-
-    bool match_found = false;
-    double best_score = 0.0;
-    std::string best_match;
-
-    auto scorer = rapidfuzz::fuzz::CachedRatio<std::string>(dst);
-
-    for (auto &file : root)
-    {
-        double score = scorer.ratio(file.name, best_score);
-        if (score >= best_score)
-        {
-            best_score = score;
-            best_match = file.name;
-            match_found = true;
-        }
-    }
-
-    if (!match_found)
-        return "";
-
-    return best_match;
-}
-
 std::string FGNS::fs_get_target_fuzzy(std::string dst_ext)
 {
     if (dst_ext.back() == '*')

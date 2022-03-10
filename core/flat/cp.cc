@@ -21,7 +21,7 @@ bool FGNS::cp(FGNS::FlatBlock &block, std::string src, std::string dst, int mode
         FGNS::File &source = *FGNS::get_file_ptr(block.root, src, mode);
 
         FGNS::File new_file(block.F_IDGEN);
-        new_file.name = dst;
+        new_file.NAME = dst;
         new_file.content = source.content;
         new_file.ENCRYPTED = source.ENCRYPTED;
         new_file.HASH = source.HASH;

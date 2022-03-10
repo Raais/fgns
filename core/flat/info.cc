@@ -9,7 +9,7 @@ bool FGNS::info(FGNS::FlatBlock &block, std::string dst, int mode)
     {
         FGNS::File &file = *FGNS::get_file_ptr(block.root, dst, mode);
 
-        printf("Name: %s\n", file.name.c_str());
+        printf("Name: %s\n", file.NAME.c_str());
         printf("ID: %u\n", file.ID);
         printf("Size: %zu\n", file.content.size());
         printf("Encrypted: %d\n", file.ENCRYPTED);

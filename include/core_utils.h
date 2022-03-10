@@ -25,14 +25,8 @@ using rapidfuzz::fuzz::ratio;
 #include "encode.hpp"
 #include "decode.hpp"
 
-#include "core_types.h"
-
 namespace FGNS
 {
-          File* get_file_ptr (std::vector<File> &root, std::string dst, int mode = 0);
-
-    std::string root_get_target_fuzzy (std::vector<File> &root, std::string dst);
-
     std::string fs_get_target_fuzzy (std::string dst_ext);
 
     std::string input_sanitizer_special_chars (std::string input);
