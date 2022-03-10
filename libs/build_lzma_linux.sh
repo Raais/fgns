@@ -1,1 +1,0 @@
-https://github.com/elsamuko/xz_test/blob/master/scripts/build_lzma_linux.sh

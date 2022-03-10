@@ -1,6 +1,6 @@
 #include "flat_utils.h"
 
-bool FGNS::importdir(FGNS::FlatBlock &block, std::string dstdir_ext)
+bool FGNS::Flat::importdir(FGNS::Flat::Block &block, std::string dstdir_ext)
 {
     if (dstdir_ext.back() == '%')
     {
@@ -13,8 +13,8 @@ bool FGNS::importdir(FGNS::FlatBlock &block, std::string dstdir_ext)
                 {
                     std::string filename = it->path().string();
                     filename = FGNS::input_sanitizer_special_chars(filename);
-                    FGNS::touch(block, filename);
-                    FGNS::write(block, filename, FGNS::read_ext(it->path().string()));
+                    FGNS::Flat::touch(block, filename);
+                    FGNS::Flat::write(block, filename, FGNS::read_ext(it->path().string()));
                 }
             }
 
@@ -36,8 +36,8 @@ bool FGNS::importdir(FGNS::FlatBlock &block, std::string dstdir_ext)
                 {
                     std::string filename = it->path().string();
                     filename = FGNS::input_sanitizer_special_chars(filename);
-                    FGNS::touch(block, filename);
-                    FGNS::write(block, filename, FGNS::read_ext(it->path().string()));
+                    FGNS::Flat::touch(block, filename);
+                    FGNS::Flat::write(block, filename, FGNS::read_ext(it->path().string()));
                 }
             }
 

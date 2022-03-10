@@ -1,19 +1,23 @@
 #include "flat_utils.h"
 
-bool FGNS::rm(FGNS::FlatBlock &block, std::string dst, int mode)
+bool FGNS::Flat::rm(FGNS::Flat::Block &block, std::string dst, int mode)
 {
-    if(FGNS::exists(block, dst, mode))
+    if(FGNS::Flat::exists(block, dst, mode))
     {
-        if (mode == 0)
+        FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
+        if (file.DIRECTORY)
         {
-            block.root.erase(std::remove_if(block.root.begin(), block.root.end(), [&dst](FGNS::File &file) { return file.NAME == dst; }), block.root.end());
-            return true;
+            auto dirroot = FGNS::Flat::gen_dir_root(block.root, std::to_string(file.ID), 1);
+            for (auto fileptr : dirroot)
+            {
+                block.root.erase(std::remove_if(block.root.begin(), block.root.end(), [&](const FGNS::Flat::File &f)
+                    { return f.ID == fileptr->ID; }), block.root.end());
+            }
         }
-        else
-        {
-            block.root.erase(std::remove_if(block.root.begin(), block.root.end(), [&dst](FGNS::File &file) { return file.ID == std::stoi(dst); }), block.root.end());
-            return true;
-        }
+        block.root.erase(std::remove_if(block.root.begin(), block.root.end(), [&](const FGNS::Flat::File &f)
+            { return f.ID == file.ID; }), block.root.end());
+
+        return true;
     }
     else
     {

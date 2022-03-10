@@ -1,14 +1,27 @@
 #include "flat_utils.h"
 
-bool FGNS::exists(FGNS::FlatBlock &block, std::string dst, int mode)
+bool FGNS::Flat::exists(FGNS::Flat::Block &block, std::string dst, int mode)
 {
-    std::string q;
-    for (auto &file : block.root)
+    if (mode == 1)
     {
-        (mode == 0) ? q = file.NAME : q = std::to_string(file.ID);
-        
-        if (q == dst)
-            return true;
+        for (auto &file : block.root)
+        {
+            if (std::to_string(file.ID) == dst)
+                return true;
+        }
+        return false;
     }
-    return false;
+    else
+    {
+        auto wd = FGNS::Flat::gen_dir_root(block.root, std::to_string(block.WORKDIR), 1);
+
+        for (auto fileptr : wd)
+        {
+            FGNS::Flat::File &file = *fileptr;
+
+            if (file.NAME == dst)
+                return true;
+        }
+        return false;
+    }
 }

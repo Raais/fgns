@@ -1,13 +1,13 @@
 #include "flat_utils.h"
 
-bool FGNS::fexport(FGNS::FlatBlock &block, std::string src, std::string dst_ext, int mode)
+bool FGNS::Flat::fexport(FGNS::Flat::Block &block, std::string src, std::string dst_ext, int mode)
 {
     if ((mode == 0) && (src.back() == '*'))
-        src = FGNS::root_get_target_fuzzy(block.root, src);
+        src = FGNS::Flat::get_target_fuzzy(block.root, src);
 
-    if (FGNS::exists(block, src, mode))
+    if (FGNS::Flat::exists(block, src, mode))
     {
-        FGNS::File &file = *FGNS::get_file_ptr(block.root, src, mode);
+        FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, src, mode);
         if (dst_ext == "")
             dst_ext = file.NAME;
 

@@ -31,10 +31,12 @@ int main(int argc, char *argv[])
         ("f,mount", "mount block <FILE>", cxxopts::value<std::string>())
         ("t,target", "positional argument (-t <src> -...)", cxxopts::value<std::string>())
         ("l,ls", "print root")
-        ("n,touch", "create <dst>", cxxopts::value<std::string>())
+        ("c,cd", "cd to <dst>", cxxopts::value<std::string>())
+        ("n,touch", "create file <dst>", cxxopts::value<std::string>())
+        ("m,mkdir", "create directory <dst>", cxxopts::value<std::string>())
         ("r,rm", "delete <dst>", cxxopts::value<std::string>())
-        ("c,cp", "(-t <src>) copy to <dst>", cxxopts::value<std::string>())
-        ("m,mv", "(-t <src>) rename to <dst>", cxxopts::value<std::string>())
+        ("p,cp", "(-t <src>) copy to <dst>", cxxopts::value<std::string>())
+        ("M,mv", "(-t <src>) rename to <dst>", cxxopts::value<std::string>())
         ("C,cat", "cat <dst>", cxxopts::value<std::string>())
         ("w,write", "(-t <src>) write <content>", cxxopts::value<std::string>())
         ("Q,info", "print info about <dst>", cxxopts::value<std::string>())
@@ -50,7 +52,7 @@ int main(int argc, char *argv[])
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
         ("Z,autosave", "toggle autosave (-s)\n"\
-                       "blocks are autosaved by default",\ 
+                       "blocks are autosaved by default",\
          cxxopts::value<bool>()->default_value("false"))
         ("s,save", "save mounted block (if autosave off)")
         ("S,Save", "save buffer to <FILE> / create new empty <FILE>", cxxopts::value<std::string>());
@@ -101,7 +103,7 @@ int main(int argc, char *argv[])
         exit(!FGNS::decompress_ext(arg));
     }
 
-    FGNS::FlatBlock block;
+    FGNS::Flat::Block block;
 
     std::string src;
     bool compressed = false;
@@ -124,7 +126,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Invalid or corrupted file\n");
                 exit(1);
             }
-            block = FGNS::load_bin(arg);
+            block = FGNS::Flat::load_bin(arg);
             mounted = true;
             mounted_file = arg;
         }
@@ -141,23 +143,31 @@ int main(int argc, char *argv[])
             block.AUTOSAVE = !block.AUTOSAVE;
     }
 
-    if (result.count("jsondump"))
-    {
-        std::string arg = result["jsondump"].as<std::string>();
-        FGNS::save_json(block, arg);
-        exit(0);
-    }
-
     for (auto &arg : result.arguments())
     {
         if (arg.key() == "target")
             src = arg.value();
 
         else if (arg.key() == "ls")
-            FGNS::ls(block);
+            FGNS::Flat::ls(block);
+
+        else if (arg.key() == "cd")
+        {
+            std::string dst = arg.value();
+            if (dst.front() == '@')
+            {
+                dst.erase(0, 1);
+                EXIT_CODE = !FGNS::Flat::cd(block, dst, 1);
+            }
+            else
+                EXIT_CODE = !FGNS::Flat::cd(block, dst);
+        }
 
         else if (arg.key() == "touch")
-            EXIT_CODE = !FGNS::touch(block, arg.value());
+            EXIT_CODE = !FGNS::Flat::touch(block, arg.value());
+
+        else if (arg.key() == "mkdir")
+            EXIT_CODE = !FGNS::Flat::mkdir(block, arg.value());
 
         else if (arg.key() == "rm")
         {
@@ -165,10 +175,10 @@ int main(int argc, char *argv[])
             if (dst.front() == '@')
             {
                 dst.erase(0, 1);
-                EXIT_CODE = !FGNS::rm(block, dst, 1);
+                EXIT_CODE = !FGNS::Flat::rm(block, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::rm(block, dst);
+                EXIT_CODE = !FGNS::Flat::rm(block, dst);
         }
 
         else if (arg.key() == "cp")
@@ -177,10 +187,10 @@ int main(int argc, char *argv[])
             if (src.front() == '@')
             {
                 src.erase(0, 1);
-                EXIT_CODE = !FGNS::cp(block, src, dst, 1);
+                EXIT_CODE = !FGNS::Flat::cp(block, src, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::cp(block, src, dst);
+                EXIT_CODE = !FGNS::Flat::cp(block, src, dst);
         }
 
         else if (arg.key() == "mv")
@@ -189,10 +199,10 @@ int main(int argc, char *argv[])
             if (src.front() == '@')
             {
                 src.erase(0, 1);
-                EXIT_CODE = !FGNS::mv(block, src, dst, 1);
+                EXIT_CODE = !FGNS::Flat::mv(block, src, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::mv(block, src, dst);
+                EXIT_CODE = !FGNS::Flat::mv(block, src, dst);
         }
 
         else if (arg.key() == "cat")
@@ -201,10 +211,10 @@ int main(int argc, char *argv[])
             if (dst.front() == '@')
             {
                 dst.erase(0, 1);
-                EXIT_CODE = !FGNS::cat(block, dst, 1);
+                EXIT_CODE = !FGNS::Flat::cat(block, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::cat(block, dst);
+                EXIT_CODE = !FGNS::Flat::cat(block, dst);
         }
 
         else if (arg.key() == "write")
@@ -214,10 +224,10 @@ int main(int argc, char *argv[])
             if (dst.front() == '@')
             {
                 dst.erase(0, 1);
-                EXIT_CODE = !FGNS::write(block, dst, content, 1);
+                EXIT_CODE = !FGNS::Flat::write(block, dst, content, 1);
             }
             else
-                EXIT_CODE = !FGNS::write(block, dst, content);
+                EXIT_CODE = !FGNS::Flat::write(block, dst, content);
         }
 
         else if (arg.key() == "info")
@@ -226,10 +236,10 @@ int main(int argc, char *argv[])
             if (dst.front() == '@')
             {
                 dst.erase(0, 1);
-                EXIT_CODE = !FGNS::info(block, dst, 1);
+                EXIT_CODE = !FGNS::Flat::info(block, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::info(block, dst);
+                EXIT_CODE = !FGNS::Flat::info(block, dst);
         }
 
         else if (arg.key() == "encrypt")
@@ -239,10 +249,10 @@ int main(int argc, char *argv[])
             if (dst.front() == '@')
             {
                 dst.erase(0, 1);
-                EXIT_CODE = !FGNS::encrypt(block, dst, password, 1);
+                EXIT_CODE = !FGNS::Flat::encrypt(block, dst, password, 1);
             }
             else
-                EXIT_CODE = !FGNS::encrypt(block, dst, password);
+                EXIT_CODE = !FGNS::Flat::encrypt(block, dst, password);
         }
 
         else if (arg.key() == "decrypt")
@@ -252,17 +262,17 @@ int main(int argc, char *argv[])
             if (dst.front() == '@')
             {
                 dst.erase(0, 1);
-                EXIT_CODE = !FGNS::decrypt(block, dst, password, 1);
+                EXIT_CODE = !FGNS::Flat::decrypt(block, dst, password, 1);
             }
             else
-                EXIT_CODE = !FGNS::decrypt(block, dst, password);
+                EXIT_CODE = !FGNS::Flat::decrypt(block, dst, password);
         }
 
         else if (arg.key() == "import")
-            EXIT_CODE = !FGNS::import(block, arg.value());
+            EXIT_CODE = !FGNS::Flat::import(block, arg.value());
 
         else if (arg.key() == "importdir")
-            EXIT_CODE = !FGNS::importdir(block, arg.value());
+            EXIT_CODE = !FGNS::Flat::importdir(block, arg.value());
 
         else if (arg.key() == "export")
         {
@@ -270,10 +280,10 @@ int main(int argc, char *argv[])
             if (src.front() == '@')
             {
                 src.erase(0, 1);
-                EXIT_CODE = !FGNS::fexport(block, src, dst, 1);
+                EXIT_CODE = !FGNS::Flat::fexport(block, src, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::fexport(block, src, dst);
+                EXIT_CODE = !FGNS::Flat::fexport(block, src, dst);
         }
 
         else if (arg.key() == "exists")
@@ -282,17 +292,17 @@ int main(int argc, char *argv[])
             if (dst.front() == '@')
             {
                 dst.erase(0, 1);
-                EXIT_CODE = !FGNS::exists(block, dst, 1);
+                EXIT_CODE = !FGNS::Flat::exists(block, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::exists(block, dst);
+                EXIT_CODE = !FGNS::Flat::exists(block, dst);
         }
 
         else if (arg.key() == "save")
         {
             if (mounted)
                 if (!block.AUTOSAVE)
-                    FGNS::save_bin(block, mounted_file);
+                    FGNS::Flat::save_bin(block, mounted_file);
         }
 
         else if (arg.key() == "Save")
@@ -301,14 +311,21 @@ int main(int argc, char *argv[])
             if (!FGNS::has_suffix(filename, FLAT_BLOCK_EXTENSION))
                 filename += FLAT_BLOCK_EXTENSION;
 
-            FGNS::save_bin(block, filename);
+            FGNS::Flat::save_bin(block, filename);
         }
+    }
+
+    if (result.count("jsondump"))
+    {
+        std::string arg = result["jsondump"].as<std::string>();
+        FGNS::Flat::save_json(block, arg);
+        exit(0);
     }
 
     if (mounted)
     {
         if (block.AUTOSAVE)
-            FGNS::save_bin(block, mounted_file);
+            FGNS::Flat::save_bin(block, mounted_file);
         if (compressed)
             FGNS::compress_ext(mounted_file);
     }

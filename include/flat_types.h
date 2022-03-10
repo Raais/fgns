@@ -48,9 +48,7 @@ struct File
     std::vector<unsigned int> files;
 
     File(){}
-    File(unsigned int &F_IDGEN) : TIMESTAMP((unsigned int)std::time(NULL)), NAME(""), ID(F_IDGEN), PARENT(-1), ENCRYPTED(false),
-      HASH(""), SALT(""), content(""), DIRECTORY(false){}
-    File(unsigned int &F_IDGEN, signed int &PARENT_ID) : TIMESTAMP((unsigned int)std::time(NULL)), NAME(""), ID(F_IDGEN),
+    File(unsigned int &IDSEED, signed int &PARENT_ID) : TIMESTAMP((unsigned int)std::time(NULL)), NAME(""), ID(IDSEED),
       PARENT(PARENT_ID), ENCRYPTED(false), HASH(""), SALT(""), content(""), DIRECTORY(false){}
 
   private:
@@ -65,19 +63,19 @@ struct File
 struct Block
 {
     unsigned int TIMESTAMP;
-    unsigned int F_IDGEN;
+    unsigned int IDSEED;
     bool         AUTOSAVE;
     signed int   WORKDIR;
 
     std::vector<File> root;
 
-    FlatBlock() : TIMESTAMP((unsigned int)std::time(NULL)), F_IDGEN(0), AUTOSAVE(true), WORKDIR(-1){}
+    Block() : TIMESTAMP((unsigned int)std::time(NULL)), IDSEED(0), AUTOSAVE(true), WORKDIR(-1){}
 
   private:
     friend class cereal::access;
     template <class Archive> void serialize(Archive &ar)
     {
-        ar(CEREAL_NVP(TIMESTAMP), CEREAL_NVP(F_IDGEN), CEREAL_NVP(AUTOSAVE), CEREAL_NVP(WORKDIR), CEREAL_NVP(root));
+        ar(CEREAL_NVP(TIMESTAMP), CEREAL_NVP(IDSEED), CEREAL_NVP(AUTOSAVE), CEREAL_NVP(WORKDIR), CEREAL_NVP(root));
     }
 };
 

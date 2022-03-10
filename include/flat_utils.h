@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <fstream>
 #include <iomanip>
@@ -17,26 +18,41 @@
 
 namespace FGNS
 {
-    void   ls        (Flat::Block &block);
-    bool   touch     (Flat::Block &block, std::string dst);
-    bool   rm        (Flat::Block &block, std::string dst,                       int mode = 0);
-    bool   cat       (Flat::Block &block, std::string dst,                       int mode = 0);
-    bool   info      (Flat::Block &block, std::string dst,                       int mode = 0);
-    bool   exists    (Flat::Block &block, std::string dst,                       int mode = 0);
-    bool   cp        (Flat::Block &block, std::string src, std::string dst,      int mode = 0);
-    bool   mv        (Flat::Block &block, std::string src, std::string dst,      int mode = 0);
-    bool   write     (Flat::Block &block, std::string dst, std::string content,  int mode = 0);
-    bool   encrypt   (Flat::Block &block, std::string dst, std::string password, int mode = 0);
-    bool   decrypt   (Flat::Block &block, std::string dst, std::string password, int mode = 0);
-    bool   fexport   (Flat::Block &block, std::string src, std::string dst_ext,  int mode = 0);
-    bool   import    (Flat::Block &block, std::string dst_ext);
-    bool   importdir (Flat::Block &block, std::string dstdir_ext);
 
+namespace Flat
+{
+    //Core
+    void   ls        (Block &block);
+    bool   cd        (Block &block, std::string dst,                       int mode = 0);
+    bool   touch     (Block &block, std::string dst);
+    bool   mkdir     (Block &block, std::string dst);
+    bool   rm        (Block &block, std::string dst,                       int mode = 0);
+    bool   cat       (Block &block, std::string dst,                       int mode = 0);
+    bool   info      (Block &block, std::string dst,                       int mode = 0);
+    bool   exists    (Block &block, std::string dst,                       int mode = 0);
+    bool   cp        (Block &block, std::string src, std::string dst,      int mode = 0);
+    bool   mv        (Block &block, std::string src, std::string dst,      int mode = 0);
+    bool   write     (Block &block, std::string dst, std::string content,  int mode = 0);
+    bool   encrypt   (Block &block, std::string dst, std::string password, int mode = 0);
+    bool   decrypt   (Block &block, std::string dst, std::string password, int mode = 0);
+    bool   fexport   (Block &block, std::string src, std::string dst_ext,  int mode = 0);
+    bool   import    (Block &block, std::string dst_ext);
+    bool   importdir (Block &block, std::string dstdir_ext);
+
+    //Misc
     File*  get_file_ptr  (std::vector<Flat::File> &root, std::string dst, int mode = 0);
-    std::string root_get_target_fuzzy (std::vector<Flat::File> &root, std::string dst);
+    File*  get_file_ptr  (std::vector<Flat::File*> &root, std::string dst, int mode = 0);
+    File&  get_file_wrapper  (Block &block, std::string dst, int mode = 0);
+    std::string get_path(std::vector<Flat::File> &root, std::string dst, int mode = 0);
+    std::vector<File*> gen_dir_root(std::vector<Flat::File> &root, std::string dst, int mode = 0);
+    std::string get_target_fuzzy (std::vector<Flat::File> &root, std::string dst);
     
-    void   save_bin  (Flat::Block &block, std::string dst_ext);
-    FlatBlock   load_bin  (std::string dst_ext);
-    void   save_json (Flat::Block &block, std::string dst_ext); //FIXME
-    FlatBlock   load_json (std::string dst_ext);               //FIXME
+    //IO
+    void   save_bin  (Block &block, std::string dst_ext);
+    Flat::Block   load_bin  (std::string dst_ext);
+    void   save_json (Block &block, std::string dst_ext); //FIXME
+    Flat::Block   load_json (std::string dst_ext);               //FIXME
+
+}
+
 }
