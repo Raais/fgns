@@ -7,8 +7,12 @@ bool FGNS::Flat::importdir(FGNS::Flat::Block &block, std::string dstdir_ext)
         dstdir_ext.pop_back();
         if (fs::exists(dstdir_ext) && fs::is_directory(dstdir_ext))
          {
+            auto oldwd = block.WORKDIR;
+            FGNS::Flat::mkdir(block, dstdir_ext);
+            FGNS::Flat::cd(block, dstdir_ext);
             for(fs::recursive_directory_iterator it(dstdir_ext), end; it != end; ++it)
             {
+                
                 if (fs::is_regular_file(it->path()))
                 {
                     std::string filename = it->path().string();
@@ -17,6 +21,7 @@ bool FGNS::Flat::importdir(FGNS::Flat::Block &block, std::string dstdir_ext)
                     FGNS::Flat::write(block, filename, FGNS::read_ext(it->path().string()));
                 }
             }
+            block.WORKDIR = oldwd;
 
             return true;
          }
@@ -30,6 +35,9 @@ bool FGNS::Flat::importdir(FGNS::Flat::Block &block, std::string dstdir_ext)
     {
         if (fs::exists(dstdir_ext) && fs::is_directory(dstdir_ext))
          {
+            auto oldwd = block.WORKDIR;
+            FGNS::Flat::mkdir(block, dstdir_ext);
+            FGNS::Flat::cd(block, dstdir_ext);
             for(fs::directory_iterator it(dstdir_ext), end; it != end; ++it)
             {
                 if (fs::is_regular_file(it->path()))
@@ -40,6 +48,7 @@ bool FGNS::Flat::importdir(FGNS::Flat::Block &block, std::string dstdir_ext)
                     FGNS::Flat::write(block, filename, FGNS::read_ext(it->path().string()));
                 }
             }
+            block.WORKDIR = oldwd;
 
             return true;
          }

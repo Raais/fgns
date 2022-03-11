@@ -93,8 +93,10 @@ std::vector<FGNS::Flat::File*> FGNS::Flat::gen_dir_root(std::vector<FGNS::Flat::
     }
 }
 
-std::string FGNS::Flat::get_target_fuzzy(std::vector<FGNS::Flat::File> &root, std::string dst)
+std::string FGNS::Flat::get_target_fuzzy(FGNS::Flat::Block &block, std::string dst)
 {
+    auto wd = FGNS::Flat::gen_dir_root(block.root, std::to_string(block.WORKDIR), 1);
+
     if (dst.back() == '*')
         dst.pop_back();
 
@@ -104,13 +106,13 @@ std::string FGNS::Flat::get_target_fuzzy(std::vector<FGNS::Flat::File> &root, st
 
     auto scorer = rapidfuzz::fuzz::CachedRatio<std::string>(dst);
 
-    for (auto &file : root)
+    for (auto file : wd)
     {
-        double score = scorer.ratio(file.NAME, best_score);
+        double score = scorer.ratio(file->NAME, best_score);
         if (score >= best_score)
         {
             best_score = score;
-            best_match = file.NAME;
+            best_match = file->NAME;
             match_found = true;
         }
     }

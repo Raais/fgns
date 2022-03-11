@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         ("I,importdir", "import external <dstdir_ext>\nSee also:\n"\
                         "find <expr> -type f -exec fgns -f <FILE> -i {} \\;",\
          cxxopts::value<std::string>())
-        ("e,export", "(-t <src>) export to <dst_ext>", cxxopts::value<std::string>())
+        ("e,export", "export <dst>", cxxopts::value<std::string>())
         ("q,exists", "check if <dst> exists and return 0/1", cxxopts::value<std::string>())
         ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
@@ -278,13 +278,13 @@ int main(int argc, char *argv[])
         else if (arg.key() == "export")
         {
             std::string dst = arg.value();
-            if (src.front() == '@')
+            if (dst.front() == '@')
             {
-                src.erase(0, 1);
-                EXIT_CODE = !FGNS::Flat::fexport(block, src, dst, 1);
+                dst.erase(0, 1);
+                EXIT_CODE = !FGNS::Flat::fexport(block, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::Flat::fexport(block, src, dst);
+                EXIT_CODE = !FGNS::Flat::fexport(block, dst);
         }
 
         else if (arg.key() == "exists")

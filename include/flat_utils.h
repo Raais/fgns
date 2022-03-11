@@ -35,7 +35,7 @@ namespace Flat
     bool   write     (Block &block, std::string dst, std::string content,  int mode = 0);
     bool   encrypt   (Block &block, std::string dst, std::string password, int mode = 0);
     bool   decrypt   (Block &block, std::string dst, std::string password, int mode = 0);
-    bool   fexport   (Block &block, std::string src, std::string dst_ext,  int mode = 0);
+    bool   fexport   (Block &block, std::string dst,                       int mode = 0);
     bool   import    (Block &block, std::string dst_ext);
     bool   importdir (Block &block, std::string dstdir_ext);
 
@@ -45,13 +45,13 @@ namespace Flat
     File&  get_file_wrapper  (Block &block, std::string dst, int mode = 0);
     std::string get_path(std::vector<Flat::File> &root, std::string dst, int mode = 0);
     std::vector<File*> gen_dir_root(std::vector<Flat::File> &root, std::string dst, int mode = 0);
-    std::string get_target_fuzzy (std::vector<Flat::File> &root, std::string dst);
+    std::string get_target_fuzzy (Block &block, std::string dst);
     
     //IO
     void   save_bin  (Block &block, std::string dst_ext);
     Flat::Block   load_bin  (std::string dst_ext);
     void   save_json (Block &block, std::string dst_ext); //FIXME
-    Flat::Block   load_json (std::string dst_ext);               //FIXME
+    Flat::Block   load_json (std::string dst_ext);        //FIXME
 
 }
 

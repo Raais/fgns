@@ -4,7 +4,7 @@ bool FGNS::Flat::cp(FGNS::Flat::Block &block, std::string src, std::string dst, 
 {
     dst = FGNS::input_sanitizer_special_chars(dst);
     if ((mode == 0) && (src.back() == '*'))
-        src = FGNS::Flat::get_target_fuzzy(block.root, src);
+        src = FGNS::Flat::get_target_fuzzy(block, src);
         
     if (!FGNS::Flat::exists(block, src, mode))
     {

@@ -23,7 +23,7 @@ bool FGNS::Flat::cd(FGNS::Flat::Block &block, std::string dst, int mode)
     else
     {
         if ((mode == 0) && (dst.back() == '*'))
-            dst = FGNS::Flat::get_target_fuzzy(block.root, dst);
+            dst = FGNS::Flat::get_target_fuzzy(block, dst);
             
         if (FGNS::Flat::exists(block, dst, mode))
         {
