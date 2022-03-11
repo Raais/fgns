@@ -19,7 +19,7 @@ bool FGNS::Flat::fexport(FGNS::Flat::Block &block, std::string src, std::string 
     }
     else
     {
-        fprintf(stderr, "File does not exist\n");
+        fprintf(stderr, "export: file does not exist\n");
         return false;
     }
 }

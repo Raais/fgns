@@ -8,12 +8,12 @@ bool FGNS::Flat::cp(FGNS::Flat::Block &block, std::string src, std::string dst, 
         
     if (!FGNS::Flat::exists(block, src, mode))
     {
-        fprintf(stderr, "File does not exist\n");
+        fprintf(stderr, "cp: file does not exist\n");
         return false;
     }
     if (FGNS::Flat::exists(block, dst, 0))
     {
-        fprintf(stderr, "File already exists\n");
+        fprintf(stderr, "cp: file already exists\n");
         return false;
     }
     else

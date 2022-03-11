@@ -6,7 +6,7 @@ bool FGNS::Flat::cd(FGNS::Flat::Block &block, std::string dst, int mode)
     {
         if (block.WORKDIR == -1)
         {
-            fprintf(stderr, "Already at root\n");
+            fprintf(stderr, "cd: already at root\n");
             return false;
         }
         else
@@ -36,13 +36,13 @@ bool FGNS::Flat::cd(FGNS::Flat::Block &block, std::string dst, int mode)
             }
             else
             {
-                fprintf(stderr, "Not a directory\n");
+                fprintf(stderr, "cd: not a directory\n");
                 return false;
             }
         }
         else
         {
-            fprintf(stderr, "File does not exist\n");
+            fprintf(stderr, "cd: target does not exist\n");
             return false;
         }
     }

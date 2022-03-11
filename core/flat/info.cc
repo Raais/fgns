@@ -21,7 +21,7 @@ bool FGNS::Flat::info(FGNS::Flat::Block &block, std::string dst, int mode)
     }
     else
     {
-        fprintf(stderr, "File does not exist\n");
+        fprintf(stderr, "info: file does not exist\n");
         return false;
     }
 }

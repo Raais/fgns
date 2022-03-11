@@ -10,7 +10,7 @@ bool FGNS::Flat::write(FGNS::Flat::Block &block, std::string dst, std::string co
         FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
         if (file.DIRECTORY)
         {
-            fprintf(stderr, "Cannot write to a directory\n");
+            fprintf(stderr, "write: cannot write to a directory\n");
             return false;
         }
 
@@ -20,7 +20,7 @@ bool FGNS::Flat::write(FGNS::Flat::Block &block, std::string dst, std::string co
     }
     else
     {
-        fprintf(stderr, "File does not exist\n");
+        fprintf(stderr, "write: file does not exist\n");
         return false;
     }
 }

@@ -20,13 +20,13 @@ bool FGNS::Flat::import(FGNS::Flat::Block &block, std::string dst_ext)
         }
         else
         {
-            fprintf(stderr, "File already exists\n");
+            fprintf(stderr, "import: file already exists\n");
             return false;
         }
     }
     else
     {
-        fprintf(stderr, "File does not exist\n");
+        fprintf(stderr, "import: file does not exist\n");
         return false;
     }
 }
