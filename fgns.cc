@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
                         "find <expr> -type f -exec fgns -f <FILE> -i {} \\;",\
          cxxopts::value<std::string>())
         ("e,export", "export <dst>", cxxopts::value<std::string>())
+        ("E,exportdir", "export directory <dst>", cxxopts::value<std::string>())
         ("q,exists", "check if <dst> exists and return 0/1", cxxopts::value<std::string>())
         ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
@@ -285,6 +286,18 @@ int main(int argc, char *argv[])
             }
             else
                 EXIT_CODE = !FGNS::Flat::fexport(block, dst);
+        }
+
+        else if (arg.key() == "exportdir")
+        {
+            std::string dst = arg.value();
+            if (dst.front() == '@')
+            {
+                dst.erase(0, 1);
+                EXIT_CODE = !FGNS::Flat::exportdir(block, dst, 1);
+            }
+            else
+                EXIT_CODE = !FGNS::Flat::exportdir(block, dst);
         }
 
         else if (arg.key() == "exists")

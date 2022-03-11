@@ -53,7 +53,7 @@ bool FGNS::Flat::cp(FGNS::Flat::Block &block, std::string src, std::string dst, 
                 wd.directories.push_back(new_dir.ID);
             }
 
-            auto oldwd = block.WORKDIR;
+            signed int oldwd = block.WORKDIR;
             auto srcroot = FGNS::Flat::gen_dir_root(block.root, std::to_string(source.ID), 1);
             block.WORKDIR = new_dir.ID;
             for (auto &file : srcroot)

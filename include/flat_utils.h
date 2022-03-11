@@ -36,6 +36,7 @@ namespace Flat
     bool   encrypt   (Block &block, std::string dst, std::string password, int mode = 0);
     bool   decrypt   (Block &block, std::string dst, std::string password, int mode = 0);
     bool   fexport   (Block &block, std::string dst,                       int mode = 0);
+    bool   exportdir (Block &block, std::string dst,                       int mode = 0);
     bool   import    (Block &block, std::string dst_ext);
     bool   importdir (Block &block, std::string dstdir_ext);
 
