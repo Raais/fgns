@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
         ("h,help", "print usage")
         ("v,version", "print version")
         ("f,mount", "mount block <FILE>", cxxopts::value<std::string>())
+        ("L,load", "load in interactive mode", cxxopts::value<bool>()->default_value("false"))
         ("t,target", "positional argument (-t <src> -...)", cxxopts::value<std::string>())
         ("l,ls", "print root")
         ("c,cd", "cd to <dst>", cxxopts::value<std::string>())
@@ -328,6 +329,98 @@ int main(int argc, char *argv[])
             FGNS::Flat::save_bin(block, mounted_file);
         if (compressed)
             FGNS::compress_ext(mounted_file);
+    }
+
+    if (!result.count("load"))
+    {
+        return EXIT_CODE;
+    }
+
+    // interactive mode
+    printf("FGNS %s © Raais N. 2022\n", FGNS_VERSION);
+    std::string command;
+    while (std::getline(std::cin, command))
+    {
+        std::vector<std::string> cmd = FGNS::usplit(command, " ");
+        if (cmd[0] == "help")
+        {
+
+        }
+        else if (cmd[0] == "exit")
+        {
+            break;
+        }
+        else if (cmd[0] == "ls")
+        {
+            FGNS::Flat::ls(block);
+        }
+        else if (cmd[0] == "cd")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::cd(block, dst, 1);
+                }
+                else
+                    FGNS::Flat::cd(block, dst);
+            }
+        }
+        else if (cmd[0] == "touch")
+        {
+            if (cmd.size() >= 2)
+            {
+                FGNS::Flat::touch(block, cmd[1]);
+            }
+        }
+        else if (cmd[0] == "mkdir")
+        {
+            if (cmd.size() >= 2)
+            {
+                FGNS::Flat::mkdir(block, cmd[1]);
+            }
+        }
+        else if (cmd[0] == "touch")
+        {
+            if (cmd.size() == 1)
+                FGNS::Flat::touch(block, "");
+            else
+                FGNS::Flat::touch(block, cmd[1]);
+        }
+        else if (cmd[0] == "rm")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::rm(block, dst, 1);
+                }
+                else
+                    FGNS::Flat::rm(block, dst);
+            }
+        }
+        else if (cmd[0] == "cp")
+        {
+            if (cmd.size() >= 3)
+            {
+                std::string src = cmd[1];
+                if (src.front() == '@')
+                {
+                    src.erase(0, 1);
+                    FGNS::Flat::cp(block, src, cmd[2], 1);
+                }
+                else
+                    FGNS::Flat::cp(block, src, cmd[2]);
+            }
+        }
+        else if (cmd[0] == "stats")
+        {
+            printf("%zu\n", block.root.size());
+        }
     }
 
     return EXIT_CODE;

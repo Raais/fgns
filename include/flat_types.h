@@ -55,8 +55,8 @@ struct File
     friend class cereal::access;
     template <class Archive> void serialize(Archive &ar)
     {
-        ar(CEREAL_NVP(TIMESTAMP), CEREAL_NVP(NAME), CEREAL_NVP(ID), CEREAL_NVP(ENCRYPTED), CEREAL_NVP(HASH), CEREAL_NVP(SALT),
-          CEREAL_NVP(PARENT), CEREAL_NVP(content), CEREAL_NVP(DIRECTORY), CEREAL_NVP(directories), CEREAL_NVP(files));
+        ar(CEREAL_NVP(TIMESTAMP), CEREAL_NVP(NAME), CEREAL_NVP(ID), CEREAL_NVP(PARENT), CEREAL_NVP(ENCRYPTED), CEREAL_NVP(HASH),
+          CEREAL_NVP(SALT), CEREAL_NVP(content), CEREAL_NVP(DIRECTORY), CEREAL_NVP(directories), CEREAL_NVP(files));
     }
 };
 

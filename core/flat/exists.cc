@@ -1,5 +1,6 @@
 #include "flat_utils.h"
 
+/* ID is searched globally in root; Name search is confined to working dir; */
 bool FGNS::Flat::exists(FGNS::Flat::Block &block, std::string dst, int mode)
 {
     if (mode == 1)

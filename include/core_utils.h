@@ -42,4 +42,6 @@ namespace FGNS
     std::string get_file_magic (std::string dst_ext);
 
            bool has_suffix (std::string str, std::string suffix);
+
+    std::vector<std::string> usplit(std::string s, std::string delimiter);
 }

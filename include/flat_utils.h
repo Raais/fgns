@@ -23,7 +23,7 @@ namespace Flat
 {
     //Core
     void   ls        (Block &block);
-    bool   cd        (Block &block, std::string dst,                       int mode = 0);
+    bool   cd        (Block &block, std::string dst,                       int type = 0);
     bool   touch     (Block &block, std::string dst);
     bool   mkdir     (Block &block, std::string dst);
     bool   rm        (Block &block, std::string dst,                       int mode = 0);
