@@ -434,6 +434,20 @@ int main(int argc, char *argv[])
         {
             printf("%zu\n", block.root.size());
         }
+        else if (cmd[0] == "checksum")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    printf("%s\n", FGNS::Flat::checksum(block, dst, 1).c_str());
+                }
+                else
+                    printf("%s\n", FGNS::Flat::checksum(block, dst).c_str());
+            }
+        }
     }
 
     return EXIT_CODE;

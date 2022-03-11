@@ -9,6 +9,21 @@ std::string FGNS::Crypto::GenerateSalt()
   return salt;
 }
 
+std::string FGNS::Crypto::SHA512Digest(const std::string& input)
+{
+  std::string digest;
+  CryptoPP::SHA512 sha512;
+  CryptoPP::StringSource ss(input, true,
+    new CryptoPP::HashFilter(sha512,
+      new CryptoPP::HexEncoder(
+        new CryptoPP::StringSink(digest),
+        false
+      )
+    )
+  );
+  return digest;
+}
+
 std::string FGNS::Crypto::SHA256Digest(const std::string& input)
 {
   std::string digest;
@@ -17,7 +32,8 @@ std::string FGNS::Crypto::SHA256Digest(const std::string& input)
   CryptoPP::StringSource ss(input, true,
     new CryptoPP::HashFilter(sha256,
       new CryptoPP::HexEncoder(
-        new CryptoPP::StringSink(digest)
+        new CryptoPP::StringSink(digest),
+        false
       )
     )
   );

@@ -16,6 +16,7 @@ namespace FGNS
     namespace Crypto
     {
         std::string GenerateSalt     ();
+        std::string SHA512Digest     (const std::string& input);
         std::string SHA256Digest     (const std::string& input);
         std::string HashPassword     (std::string input, const std::string &salt);
         bool AuthenticatePassword    (std::string input, const std::string &auth_hash, const std::string &salt);

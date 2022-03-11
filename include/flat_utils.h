@@ -47,6 +47,7 @@ namespace Flat
     std::string get_path(std::vector<Flat::File> &root, std::string dst, int mode = 0);
     std::vector<File*> gen_dir_root(std::vector<Flat::File> &root, std::string dst, int mode = 0);
     std::string get_target_fuzzy (Block &block, std::string dst);
+    std::string checksum (Block &block, std::string dst, int mode = 0);
     
     //IO
     void   save_bin  (Block &block, std::string dst_ext);
