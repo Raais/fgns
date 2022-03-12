@@ -10,7 +10,7 @@ bool FGNS::Flat::cat(FGNS::Flat::Block &block, std::string dst, int mode)
         FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
         if (file.DIRECTORY)
         {
-            fprintf(stderr, "cat: target is a directory\n");
+            fprintf(stderr, "cat: '%s' is a directory\n", dst.c_str());
             return false;
         }
 
@@ -20,7 +20,7 @@ bool FGNS::Flat::cat(FGNS::Flat::Block &block, std::string dst, int mode)
     }
     else
     {
-        printf("%s", "cat: file does not exist");
+        printf("%s", "cat: '%s' does not exist", dst.c_str());
         return false;
     }
 }

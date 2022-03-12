@@ -23,7 +23,7 @@ bool FGNS::Flat::mkdir(FGNS::Flat::Block &block, std::string dst)
     }
     else
     {
-        fprintf(stderr, "mkdir: file or directory already exists\n");
+        fprintf(stderr, "mkdir: file or directory '%s' already exists\n", dst.c_str());
         return false;
     }
 }

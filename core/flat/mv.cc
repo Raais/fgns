@@ -8,12 +8,12 @@ bool FGNS::Flat::mv(FGNS::Flat::Block &block, std::string src, std::string dst, 
     
     if (!FGNS::Flat::exists(block, src, mode))
     {
-        fprintf(stderr, "mv: file does not exist\n");
+        fprintf(stderr, "mv: '%s' does not exist\n", src.c_str());
         return false;
     }
     if (FGNS::Flat::exists(block, dst, 0))
     {
-        fprintf(stderr, "mv: file already exists\n");
+        fprintf(stderr, "mv: '%s' already exists\n", dst.c_str());
         return false;
     }
     else

@@ -36,13 +36,13 @@ bool FGNS::Flat::cd(FGNS::Flat::Block &block, std::string dst, int mode)
             }
             else
             {
-                fprintf(stderr, "cd: not a directory\n");
+                fprintf(stderr, "cd: '%s' is not a directory\n", dst.c_str());
                 return false;
             }
         }
         else
         {
-            fprintf(stderr, "cd: target does not exist\n");
+            fprintf(stderr, "cd: '%s' does not exist\n", dst.c_str());
             return false;
         }
     }

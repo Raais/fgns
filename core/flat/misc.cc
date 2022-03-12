@@ -125,6 +125,11 @@ std::string FGNS::Flat::get_target_fuzzy(FGNS::Flat::Block &block, std::string d
 
 std::string FGNS::Flat::checksum(FGNS::Flat::Block &block, std::string dst, int mode)
 {
-    FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
-    return FGNS::Crypto::SHA512Digest(file.content);
+    if (FGNS::Flat::exists(block, dst, mode))
+    {
+        FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
+        return FGNS::Crypto::SHA512Digest(file.content);
+    }
+    else
+        return "";
 }

@@ -43,7 +43,7 @@ bool FGNS::Flat::exportdir(FGNS::Flat::Block &block, std::string dst, int mode)
     }
     else
     {
-        fprintf(stderr, "exportdir: directory does not exist\n");
+        fprintf(stderr, "exportdir: '%s' does not exist\n", dst.c_str());
         return false;
     }
 

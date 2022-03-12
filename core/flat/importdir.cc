@@ -34,7 +34,7 @@ bool FGNS::Flat::importdir(FGNS::Flat::Block &block, std::string dstdir_ext)
      }
      else
      {
-        fprintf(stderr, "importdir: directory does not exist\n");
+        fprintf(stderr, "importdir: '%s' does not exist\n", dstdir_ext.c_str());
         return false;
      }
 }

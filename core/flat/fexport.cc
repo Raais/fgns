@@ -1,5 +1,5 @@
 #include "flat_utils.h"
-
+// export() is reserved
 bool FGNS::Flat::fexport(FGNS::Flat::Block &block, std::string dst, int mode)
 {
     if ((mode == 0) && (dst.back() == '*'))
@@ -23,7 +23,7 @@ bool FGNS::Flat::fexport(FGNS::Flat::Block &block, std::string dst, int mode)
     }
     else
     {
-        fprintf(stderr, "export: file does not exist\n");
+        fprintf(stderr, "export: '%s' does not exist\n", dst.c_str());
         return false;
     }
 }

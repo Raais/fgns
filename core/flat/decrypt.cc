@@ -10,7 +10,7 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
         FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
         if (file.DIRECTORY)
         {
-            fprintf(stderr, "decrypt: cannot decrypt a directory\n");
+            fprintf(stderr, "decrypt: '%s' is a directory\n", dst.c_str());
             return false;
         }
 
@@ -49,7 +49,7 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
     }
     else
     {
-        fprintf(stderr, "decrypt: file does not exist\n");
+        fprintf(stderr, "decrypt: '%s' does not exist\n", dst.c_str());
         return false;
     }
 }

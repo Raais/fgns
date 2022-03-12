@@ -10,7 +10,7 @@ bool FGNS::Flat::encrypt(FGNS::Flat::Block &block, std::string dst, std::string 
         FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
         if (file.DIRECTORY)
         {
-            fprintf(stderr, "encrypt: cannot encrypt a directory\n");
+            fprintf(stderr, "encrypt: '%s' is a directory\n", dst.c_str());
             return false;
         }
 
@@ -42,7 +42,7 @@ bool FGNS::Flat::encrypt(FGNS::Flat::Block &block, std::string dst, std::string 
     }
     else
     {
-        fprintf(stderr, "encrypt: file does not exist\n");
+        fprintf(stderr, "encrypt: '%s' does not exist\n", dst.c_str());
         return false;
     }
 }
