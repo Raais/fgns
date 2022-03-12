@@ -29,6 +29,7 @@ bool FGNS::Flat::importdir(FGNS::Flat::Block &block, std::string dstdir_ext)
             }
         }
         block.WORKDIR = oldwd;
+        block.SAVED = false;
         
         return true;
      }

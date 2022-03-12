@@ -15,6 +15,7 @@ bool FGNS::Flat::import(FGNS::Flat::Block &block, std::string dst_ext)
             dst_ext = FGNS::input_sanitizer_special_chars(dst_ext);
             FGNS::Flat::touch(block, dst_ext);
             FGNS::Flat::write(block, dst_ext, content);
+            block.SAVED = false;
 
             return true;
         }

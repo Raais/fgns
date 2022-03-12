@@ -25,6 +25,7 @@ bool FGNS::Flat::encrypt(FGNS::Flat::Block &block, std::string dst, std::string 
 
                 file.content = FGNS::Crypto::AESEncryptString(key, file.content);
                 file.ENCRYPTED = true;
+                block.SAVED = false;
 
                 return true;
             }

@@ -15,8 +15,8 @@ bool FGNS::Flat::touch(FGNS::Flat::Block &block, std::string dst)
             FGNS::Flat::File &wd = *FGNS::Flat::get_file_ptr(block.root, std::to_string(block.WORKDIR), 1);
             wd.files.push_back(new_file.ID);
         }
-
         block.IDSEED++;
+        block.SAVED = false;
 
         return true;
     }

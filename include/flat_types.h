@@ -64,18 +64,19 @@ struct Block
 {
     unsigned int TIMESTAMP;
     unsigned int IDSEED;
+    bool         SAVED;
     bool         AUTOSAVE;
     signed int   WORKDIR;
 
     std::vector<File> root;
 
-    Block() : TIMESTAMP((unsigned int)std::time(NULL)), IDSEED(0), AUTOSAVE(true), WORKDIR(-1){}
+    Block() : TIMESTAMP((unsigned int)std::time(NULL)), IDSEED(0), SAVED(true), AUTOSAVE(true), WORKDIR(-1){}
 
   private:
     friend class cereal::access;
     template <class Archive> void serialize(Archive &ar)
     {
-        ar(CEREAL_NVP(TIMESTAMP), CEREAL_NVP(IDSEED), CEREAL_NVP(AUTOSAVE), CEREAL_NVP(WORKDIR), CEREAL_NVP(root));
+        ar(CEREAL_NVP(TIMESTAMP), CEREAL_NVP(IDSEED), CEREAL_NVP(SAVED), CEREAL_NVP(AUTOSAVE), CEREAL_NVP(WORKDIR), CEREAL_NVP(root));
     }
 };
 

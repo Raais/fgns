@@ -16,8 +16,8 @@ bool FGNS::Flat::mkdir(FGNS::Flat::Block &block, std::string dst)
             FGNS::Flat::File &wd = *FGNS::Flat::get_file_ptr(block.root, std::to_string(block.WORKDIR), 1);
             wd.directories.push_back(new_dir.ID);
         }
-
         block.IDSEED++;
+        block.SAVED = false;
         
         return true;
     }

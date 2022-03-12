@@ -13,8 +13,8 @@ bool FGNS::Flat::write(FGNS::Flat::Block &block, std::string dst, std::string co
             fprintf(stderr, "write: '%s' is a directory\n", dst.c_str());
             return false;
         }
-
         file.content = content;
+        block.SAVED = false;
         
         return true;
     }

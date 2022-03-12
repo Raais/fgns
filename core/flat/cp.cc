@@ -36,6 +36,7 @@ bool FGNS::Flat::cp(FGNS::Flat::Block &block, std::string src, std::string dst, 
                 FGNS::Flat::File &wd = *FGNS::Flat::get_file_ptr(block.root, std::to_string(block.WORKDIR), 1);
                 wd.files.push_back(new_file.ID);
             }
+            block.SAVED = false;
 
             return true;
         }
@@ -61,6 +62,7 @@ bool FGNS::Flat::cp(FGNS::Flat::Block &block, std::string src, std::string dst, 
                 FGNS::Flat::cp(block, std::to_string(file->ID), file->NAME, 1);
             }
             block.WORKDIR = oldwd;
+            block.SAVED = false;
 
             return true;
         }

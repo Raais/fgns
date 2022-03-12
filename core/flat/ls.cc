@@ -15,28 +15,33 @@ void FGNS::Flat::ls(FGNS::Flat::Block &block)
     {
         FGNS::Flat::File &file = *fileptr;
 
-        std::string preview;
+        std::string preview = "";
 
         if (file.DIRECTORY)
         {
+            std::string blue = "\033[34m";
+            std::string yellow = "\033[33m";
+            std::string clear = "\033[0m";
             for (auto &f : file.files)
             {
-                preview += "[" + std::to_string(f) + "]";
+                preview += "[" + yellow + std::to_string(f) + clear + "]";
             }
             for (auto &d : file.directories)
-            {
-                preview += "[" + std::to_string(d) + "]";
+            {   
+                preview += "[" + blue + std::to_string(d) + clear + "]";
             }
-            if (preview.size() > 20)
+            if (preview.size() > 60)
             {
-                preview = preview.substr(0, 20) + "(...)";
+                preview = preview.substr(0, 60) + "[...]";
             }
 
-            printf("[%u] - %u - --- - \033[1;34m%s\033[0m (%zud,%zuf) -> %s\n",
-                file.ID, file.TIMESTAMP, file.NAME.c_str(), file.directories.size(), file.files.size(), preview.c_str());
+            printf("[%u] - --------------- - --- - \033[1;34m%s\033[0m (%zud,%zuf) -> %s\n",
+                file.ID, file.NAME.c_str(), file.directories.size(), file.files.size(), preview.c_str());
         }
         else
         {
+            std::string checksum = FGNS::Crypto::SHA512Digest(file.content);
+            checksum = checksum.substr(0, 6) + "." + checksum.substr(checksum.size() - 6, 6);
             
             if (file.content.size() > 20)
             {
@@ -47,8 +52,8 @@ void FGNS::Flat::ls(FGNS::Flat::Block &block)
                 preview = file.content;
             }
 
-            printf("[%u] - %u - $=%d - \033[33m%s\033[0m (%zuB) -> \"%s\"\n",
-                file.ID, file.TIMESTAMP, file.ENCRYPTED, file.NAME.c_str(), file.content.size(), preview.c_str());
+            printf("[%u] - #=%s - $=%d - \033[33m%s\033[0m (%zuB) -> \"%s\"\n",
+                file.ID, checksum.c_str(), file.ENCRYPTED, file.NAME.c_str(), file.content.size(), preview.c_str());
         }
 
     }

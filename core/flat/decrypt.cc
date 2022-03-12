@@ -26,6 +26,7 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
                     file.ENCRYPTED = false;
                     file.HASH = "";
                     file.SALT = "";
+                    block.SAVED = false;
 
                     return true;
                 }

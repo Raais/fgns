@@ -17,6 +17,7 @@ bool FGNS::Flat::rm(FGNS::Flat::Block &block, std::string dst, int mode)
             
             block.root.erase(std::remove_if(block.root.begin(), block.root.end(), [&file](FGNS::Flat::File &f)
                 { return f.ID == file.ID; }), block.root.end());
+            block.SAVED = false;
 
             return true;
         }
@@ -40,6 +41,7 @@ bool FGNS::Flat::rm(FGNS::Flat::Block &block, std::string dst, int mode)
 
             block.root.erase(std::remove_if(block.root.begin(), block.root.end(), [&file](FGNS::Flat::File &f)
                 { return f.ID == file.ID; }), block.root.end());
+            block.SAVED = false;
             
             return true;
         }

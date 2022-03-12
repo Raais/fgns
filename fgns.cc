@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
         ("e,export", "export <dst>", cxxopts::value<std::string>())
         ("E,exportdir", "export directory <dst>", cxxopts::value<std::string>())
         ("q,exists", "check if <dst> exists and return 0/1", cxxopts::value<std::string>())
+        ("H,checksum", "print SHA512 sum of <dst>", cxxopts::value<std::string>())
         ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
@@ -107,7 +108,7 @@ int main(int argc, char *argv[])
 
     FGNS::Flat::Block block;
 
-    std::string src;
+    std::string src_g;
     bool compressed = false;
     bool mounted = false;
     std::string mounted_file;
@@ -148,7 +149,7 @@ int main(int argc, char *argv[])
     for (auto &arg : result.arguments())
     {
         if (arg.key() == "target")
-            src = arg.value();
+            src_g = arg.value();
 
         else if (arg.key() == "ls")
             FGNS::Flat::ls(block);
@@ -186,25 +187,25 @@ int main(int argc, char *argv[])
         else if (arg.key() == "cp")
         {
             std::string dst = arg.value();
-            if (src.front() == '@')
+            if (src_g.front() == '@')
             {
-                src.erase(0, 1);
-                EXIT_CODE = !FGNS::Flat::cp(block, src, dst, 1);
+                src_g.erase(0, 1);
+                EXIT_CODE = !FGNS::Flat::cp(block, src_g, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::Flat::cp(block, src, dst);
+                EXIT_CODE = !FGNS::Flat::cp(block, src_g, dst);
         }
 
         else if (arg.key() == "mv")
         {
             std::string dst = arg.value();
-            if (src.front() == '@')
+            if (src_g.front() == '@')
             {
-                src.erase(0, 1);
-                EXIT_CODE = !FGNS::Flat::mv(block, src, dst, 1);
+                src_g.erase(0, 1);
+                EXIT_CODE = !FGNS::Flat::mv(block, src_g, dst, 1);
             }
             else
-                EXIT_CODE = !FGNS::Flat::mv(block, src, dst);
+                EXIT_CODE = !FGNS::Flat::mv(block, src_g, dst);
         }
 
         else if (arg.key() == "cat")
@@ -221,7 +222,7 @@ int main(int argc, char *argv[])
 
         else if (arg.key() == "write")
         {
-            std::string dst = src;
+            std::string dst = src_g;
             std::string content = arg.value();
             if (dst.front() == '@')
             {
@@ -246,7 +247,7 @@ int main(int argc, char *argv[])
 
         else if (arg.key() == "encrypt")
         {
-            std::string dst = src;
+            std::string dst = src_g;
             std::string password = arg.value();
             if (dst.front() == '@')
             {
@@ -259,7 +260,7 @@ int main(int argc, char *argv[])
 
         else if (arg.key() == "decrypt")
         {
-            std::string dst = src;
+            std::string dst = src_g;
             std::string password = arg.value();
             if (dst.front() == '@')
             {
@@ -312,6 +313,18 @@ int main(int argc, char *argv[])
                 EXIT_CODE = !FGNS::Flat::exists(block, dst);
         }
 
+        else if (arg.key() == "checksum")
+        {
+            std::string dst = arg.value();
+            if (dst.front() == '@')
+            {
+                dst.erase(0, 1);
+                printf("%s\n", FGNS::Flat::checksum(block, dst, 1).c_str());
+            }
+            else
+                printf("%s\n", FGNS::Flat::checksum(block, dst).c_str());
+        }
+
         else if (arg.key() == "save")
         {
             if (mounted)
@@ -326,6 +339,8 @@ int main(int argc, char *argv[])
                 filename += FLAT_BLOCK_EXTENSION;
 
             FGNS::Flat::save_bin(block, filename);
+            mounted = true;
+            mounted_file = filename;
         }
     }
 
@@ -359,14 +374,50 @@ int main(int argc, char *argv[])
         {
 
         }
+
         else if (cmd[0] == "exit")
         {
-            break;
+            if (cmd.size() == 2)
+            {
+                if (cmd[1] == "force")
+                {
+                    return 0;
+                }
+            }
+            
+            if (mounted)
+            {
+                if (!block.SAVED)
+                {
+                    printf("WARNING: mounted block not saved.\n");
+                    printf("Save block or exit force\n");
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                // a one-liner can easily be recovered by pressing up
+                // this is not the case for interactive mode
+                if (!block.SAVED)
+                {
+                    printf("WARNING: block not saved.\n");
+                    printf("Save block or exit force\n");
+                }
+                else
+                {
+                    return 0;
+                }
+            }
         }
+
         else if (cmd[0] == "ls")
         {
             FGNS::Flat::ls(block);
         }
+
         else if (cmd[0] == "cd")
         {
             if (cmd.size() >= 2)
@@ -381,6 +432,7 @@ int main(int argc, char *argv[])
                     FGNS::Flat::cd(block, dst);
             }
         }
+
         else if (cmd[0] == "touch")
         {
             if (cmd.size() >= 2)
@@ -388,6 +440,7 @@ int main(int argc, char *argv[])
                 FGNS::Flat::touch(block, cmd[1]);
             }
         }
+
         else if (cmd[0] == "mkdir")
         {
             if (cmd.size() >= 2)
@@ -395,6 +448,7 @@ int main(int argc, char *argv[])
                 FGNS::Flat::mkdir(block, cmd[1]);
             }
         }
+
         else if (cmd[0] == "touch")
         {
             if (cmd.size() == 1)
@@ -402,6 +456,7 @@ int main(int argc, char *argv[])
             else
                 FGNS::Flat::touch(block, cmd[1]);
         }
+
         else if (cmd[0] == "rm")
         {
             if (cmd.size() >= 2)
@@ -416,6 +471,7 @@ int main(int argc, char *argv[])
                     FGNS::Flat::rm(block, dst);
             }
         }
+
         else if (cmd[0] == "cp")
         {
             if (cmd.size() >= 3)
@@ -430,10 +486,152 @@ int main(int argc, char *argv[])
                     FGNS::Flat::cp(block, src, cmd[2]);
             }
         }
-        else if (cmd[0] == "stats")
+
+        else if (cmd[0] == "mv")
         {
-            printf("%zu\n", block.root.size());
+            if (cmd.size() >= 3)
+            {
+                std::string src = cmd[1];
+                if (src.front() == '@')
+                {
+                    src.erase(0, 1);
+                    FGNS::Flat::mv(block, src, cmd[2], 1);
+                }
+                else
+                    FGNS::Flat::mv(block, src, cmd[2]);
+            }
         }
+
+        else if (cmd[0] == "cat")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::cat(block, dst, 1);
+                }
+                else
+                    FGNS::Flat::cat(block, dst);
+            }
+        }
+
+        else if (cmd[0] == "write")
+        {
+            if (cmd.size() >= 3)
+            {
+                std::string src = cmd[1];
+                if (src.front() == '@')
+                {
+                    src.erase(0, 1);
+                    FGNS::Flat::write(block, src, cmd[2], 1);
+                }
+                else
+                    FGNS::Flat::write(block, src, cmd[2]);
+            }
+        }
+
+        else if (cmd[0] == "info")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::info(block, dst, 1);
+                }
+                else
+                    FGNS::Flat::info(block, dst);
+            }
+        }
+
+        else if (cmd[0] == "encrypt")
+        {
+            if (cmd.size() >= 3)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::encrypt(block, dst, cmd[2], 1);
+                }
+                else
+                    FGNS::Flat::encrypt(block, dst, cmd[2]);
+            }
+        }
+
+        else if (cmd[0] == "decrypt")
+        {
+            if (cmd.size() >= 3)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::decrypt(block, dst, cmd[2], 1);
+                }
+                else
+                    FGNS::Flat::decrypt(block, dst, cmd[2]);
+            }
+        }
+
+        else if (cmd[0] == "import")
+        {
+            FGNS::Flat::import(block, cmd[1]);
+        }
+
+        else if (cmd[0] == "importdir")
+        {
+            FGNS::Flat::importdir(block, cmd[1]);
+        }
+
+        else if (cmd[0] == "export")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::fexport(block, dst, 1);
+                }
+                else
+                    FGNS::Flat::fexport(block, dst);
+            }
+        }
+
+        else if (cmd[0] == "exportdir")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::exportdir(block, dst, 1);
+                }
+                else
+                    FGNS::Flat::exportdir(block, dst);
+            }
+        }
+
+        else if (cmd[0] == "exists")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string dst = cmd[1];
+                if (dst.front() == '@')
+                {
+                    dst.erase(0, 1);
+                    FGNS::Flat::exists(block, dst, 1);
+                }
+                else
+                    FGNS::Flat::exists(block, dst);
+            }
+        }
+
         else if (cmd[0] == "checksum")
         {
             if (cmd.size() >= 2)
@@ -448,7 +646,68 @@ int main(int argc, char *argv[])
                     printf("%s\n", FGNS::Flat::checksum(block, dst).c_str());
             }
         }
+
+        else if (cmd[0] == "mount")
+        {
+            if (cmd.size() >= 2)
+            {
+                std::string arg = cmd[1];
+                if (FGNS::exists_ext(arg))
+                {
+                    if (FGNS::get_file_magic(arg) == "xz")
+                    {
+                        FGNS::decompress_ext(arg);
+                        arg.erase(arg.size() - 3, 3);
+                        compressed = true;
+                    }
+                    else if (FGNS::get_file_magic(arg) != "fgnsflat")
+                    {
+                        fprintf(stderr, "Invalid or corrupted file\n");
+                    }
+                    block = FGNS::Flat::load_bin(arg);
+                    mounted = true;
+                    mounted_file = arg;
+                }
+                else
+                {
+                    fprintf(stderr, "File not found: %s\n", arg.c_str());
+                }
+            }
+        }
+
+        else if (cmd[0] == "save")
+        {
+            if (cmd.size() == 1)
+            {
+                if (mounted)
+                    {
+                        FGNS::Flat::save_bin(block, mounted_file);
+                        if (compressed)
+                            FGNS::compress_ext(mounted_file);
+                    }
+                else
+                    fprintf(stderr, "save: missing operand 'filename'\n");
+            }
+            else if (cmd.size() >= 2)
+            {
+                std::string filename = cmd[1];
+                if (!FGNS::has_suffix(filename, FLAT_BLOCK_EXTENSION))
+                    filename += FLAT_BLOCK_EXTENSION;
+
+                FGNS::Flat::save_bin(block, filename);
+                mounted = true;
+                mounted_file = filename;
+            }
+        }
+
+        else if (cmd[0] == "jsondump")
+        {
+            if (cmd.size() >= 2)
+            {
+                FGNS::Flat::save_json(block, cmd[1]);
+            }
+        }
     }
 
-    return EXIT_CODE;
+    return 0;
 }

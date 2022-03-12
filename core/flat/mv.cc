@@ -22,6 +22,7 @@ bool FGNS::Flat::mv(FGNS::Flat::Block &block, std::string src, std::string dst, 
 
         source.TIMESTAMP = (unsigned int)std::time(NULL);
         source.NAME = dst;
+        block.SAVED = false;
         
         return true;
     }
