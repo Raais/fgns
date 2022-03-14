@@ -108,10 +108,10 @@ int main(int argc, char *argv[])
 
     FGNS::Flat::Block block;
 
-    std::string src_g;
+    std::string src_g = "";
     bool compressed = false;
     bool mounted = false;
-    std::string mounted_file;
+    std::string mounted_file = "";
 
     if (result.count("mount"))
     {
@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
     }
 
     // interactive mode
-    printf("FGNS %s © Raais N. 2022\n\033[36m>\033[0m", FGNS_VERSION);
+    printf("FGNS %s © Raais N. 2022\n\033[32m>\033[0m", FGNS_VERSION);
     std::string command;
     while (std::getline(std::cin, command))
     {
@@ -395,7 +395,33 @@ int main(int argc, char *argv[])
         std::vector<std::string> cmd = FGNS::usplit(command, " ");
         if (cmd[0] == "help")
         {
-
+            printf("Commands:\n");
+            printf("   \033[34mhelp\033[0m      : show help\n");
+            printf("   \033[34mmount\033[0m     : mount file\n");
+            printf("   \033[34mexit\033[0m      : exit\n");
+            printf("   \033[34mls\033[0m        : print root\n");
+            printf("   \033[34mcd\033[0m        : change directory\n");
+            printf("   \033[34mtouch\033[0m     : create file\n");
+            printf("   \033[34mmkdir\033[0m     : create directory\n");
+            printf("   \033[34mrm\033[0m        : remove file/directory\n");
+            printf("   \033[34mcp\033[0m        : copy file/directory\n");
+            printf("   \033[34mmv\033[0m        : rename file/directory\n");
+            printf("   \033[34mcat\033[0m       : cat file\n");
+            printf("   \033[34mwrite\033[0m     : write file data\n");
+            printf("   \033[34minfo\033[0m      : print file info\n");
+            printf("   \033[34mencrypt\033[0m   : encrypt file\n");
+            printf("   \033[34mdecrypt\033[0m   : decrypt file\n");
+            printf("   \033[34mimport\033[0m    : import file\n");
+            printf("   \033[34mimportdir\033[0m : import directory\n");
+            printf("   \033[34mexists\033[0m    : 'target exists' bool\n");
+            printf("   \033[34mexport\033[0m    : export file\n");
+            printf("   \033[34mexportdir\033[0m : export directory\n");
+            printf("   \033[34mchecksum\033[0m  : print SHA512 sum\n");
+            printf("   \033[34mset\033[0m       : set settings\n");
+            printf("   \033[34mjsondump\033[0m  : create file\n");
+            printf("   \033[34munmount\033[0m   : unmount file\n");
+            printf("   \033[34msave\033[0m      : save file\n");
+            EXIT_CODE = 0;
         }
 
         else if (cmd[0] == "exit")
@@ -811,15 +837,24 @@ int main(int argc, char *argv[])
                         FGNS::decompress_ext(arg);
                         arg.erase(arg.size() - 3, 3);
                         compressed = true;
+
+                        block = FGNS::Flat::load_bin(arg);
+                        mounted = true;
+                        mounted_file = arg;
+                        EXIT_CODE = 0;
                     }
-                    else if (FGNS::get_file_magic(arg) != "fgnsflat")
+                    else if (FGNS::get_file_magic(arg) == "fgnsflat")
+                    {
+                        block = FGNS::Flat::load_bin(arg);
+                        mounted = true;
+                        mounted_file = arg;
+                        EXIT_CODE = 0;
+                    }
+                    else
                     {
                         fprintf(stderr, "Invalid or corrupted file\n");
+                        EXIT_CODE = 1;
                     }
-                    block = FGNS::Flat::load_bin(arg);
-                    mounted = true;
-                    mounted_file = arg;
-                    EXIT_CODE = 0;
                 }
                 else
                 {
@@ -830,6 +865,29 @@ int main(int argc, char *argv[])
             else
             {
                 fprintf(stderr, "mount: missing argument 'file'\n");
+                EXIT_CODE = 1;
+            }
+        }
+
+        else if (cmd[0] == "unmount")
+        {
+            if (mounted)
+            {
+                if (block.SAVED)
+                {
+                    mounted = false;
+                    mounted_file = "";
+                    block = FGNS::Flat::Block();
+                }
+                else
+                {
+                    fprintf(stderr, "unmount: file not saved\n");
+                    EXIT_CODE = 1;
+                }
+            }
+            else
+            {
+                fprintf(stderr, "unmount: no mounted file\n");
                 EXIT_CODE = 1;
             }
         }
@@ -862,6 +920,47 @@ int main(int argc, char *argv[])
                 mounted_file = filename;
                 EXIT_CODE = 0;
             }
+        }
+
+        else if (cmd[0] == "set")
+        {
+            if (cmd.size() >= 3)
+            {
+                if (cmd[1] == "autosave")
+                {
+                    if (cmd[2] == "on")
+                    {
+                        block.AUTOSAVE = true;
+                        EXIT_CODE = 0;
+                    }
+                    else if (cmd[2] == "off")
+                    {
+                        block.AUTOSAVE = false;
+                        EXIT_CODE = 0;
+                    }
+                    else
+                    {
+                        fprintf(stderr, "set: invalid argument '%s'\n", cmd[2].c_str());
+                        EXIT_CODE = 1;
+                    }   
+                }
+                else
+                {
+                    fprintf(stderr, "set: invalid argument '%s'\n", cmd[1].c_str());
+                    EXIT_CODE = 1;
+                }
+            }
+            else if (cmd.size() == 2)
+            {
+                fprintf(stderr, "set: missing argument 'value'\n");
+                EXIT_CODE = 1;
+            }
+            else if (cmd.size() == 1)
+            {
+                fprintf(stderr, "set: missing argument 'key'\n");
+                EXIT_CODE = 1;
+            }
+
         }
 
         else if (cmd[0] == "jsondump")
