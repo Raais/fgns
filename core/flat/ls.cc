@@ -2,13 +2,6 @@
 
 void FGNS::Flat::ls(FGNS::Flat::Block &block)
 {
-    std::string wd = "/";
-    if (block.WORKDIR != -1)
-    {
-        wd = FGNS::Flat::get_path(block.root, std::to_string(block.WORKDIR), 1);
-    }
-    printf("Working directory: [\033[32m%s\033[0m]\n\n", wd.c_str());
-
     auto wdroot = FGNS::Flat::gen_dir_root(block.root, std::to_string(block.WORKDIR), 1);
 
     for (auto fileptr : wdroot)

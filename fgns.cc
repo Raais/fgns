@@ -152,7 +152,10 @@ int main(int argc, char *argv[])
             src_g = arg.value();
 
         else if (arg.key() == "ls")
+        {
             FGNS::Flat::ls(block);
+            EXIT_CODE = 0;
+        }
 
         else if (arg.key() == "cd")
         {
@@ -365,10 +368,30 @@ int main(int argc, char *argv[])
     }
 
     // interactive mode
-    printf("FGNS %s © Raais N. 2022\n", FGNS_VERSION);
+    printf("FGNS %s © Raais N. 2022\n\033[36m>\033[0m", FGNS_VERSION);
     std::string command;
     while (std::getline(std::cin, command))
     {
+        std::string buffer = "";
+        std::string wd = "/";
+        if (block.WORKDIR != -1)
+        {
+            wd = FGNS::Flat::get_path(block.root, std::to_string(block.WORKDIR), 1);
+        }
+        if (mounted)
+        {
+            buffer = mounted_file;
+        }
+        else
+        {
+            buffer = "buffer";
+        }
+        if (!block.SAVED)
+        {
+            buffer += "*";
+        }
+        printf("\033[33m[%s]\033[0m\033[32m[%s]\033[0m$ \033[1m\033[37m%s\033[0m\n", buffer.c_str(), wd.c_str(), command.c_str());
+
         std::vector<std::string> cmd = FGNS::usplit(command, " ");
         if (cmd[0] == "help")
         {
@@ -389,7 +412,7 @@ int main(int argc, char *argv[])
             {
                 if (!block.SAVED)
                 {
-                    printf("WARNING: mounted block not saved.\n");
+                    printf("\033[31mWARNING\033[0m: mounted block not saved.\n");
                     printf("Save block or exit force\n");
                 }
                 else
@@ -403,7 +426,7 @@ int main(int argc, char *argv[])
                 // this is not the case for interactive mode
                 if (!block.SAVED)
                 {
-                    printf("WARNING: block not saved.\n");
+                    printf("\033[31mWARNING\033[0m: block not saved.\n");
                     printf("Save block or exit force\n");
                 }
                 else
@@ -416,6 +439,7 @@ int main(int argc, char *argv[])
         else if (cmd[0] == "ls")
         {
             FGNS::Flat::ls(block);
+            EXIT_CODE = 0;
         }
 
         else if (cmd[0] == "cd")
@@ -426,10 +450,15 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::cd(block, dst, 1);
+                    EXIT_CODE = !FGNS::Flat::cd(block, dst, 1);
                 }
                 else
-                    FGNS::Flat::cd(block, dst);
+                    EXIT_CODE = !FGNS::Flat::cd(block, dst);
+            }
+            else
+            {
+                fprintf(stderr, "cd: missing argument 'directory'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -437,7 +466,12 @@ int main(int argc, char *argv[])
         {
             if (cmd.size() >= 2)
             {
-                FGNS::Flat::touch(block, cmd[1]);
+                EXIT_CODE = !FGNS::Flat::touch(block, cmd[1]);
+            }
+            else
+            {
+                fprintf(stderr, "touch: missing argument 'file'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -445,16 +479,26 @@ int main(int argc, char *argv[])
         {
             if (cmd.size() >= 2)
             {
-                FGNS::Flat::mkdir(block, cmd[1]);
+                EXIT_CODE = !FGNS::Flat::mkdir(block, cmd[1]);
+            }
+            else
+            {
+                fprintf(stderr, "mkdir: missing argument 'directory'\n");
+                EXIT_CODE = 1;
             }
         }
 
         else if (cmd[0] == "touch")
         {
-            if (cmd.size() == 1)
-                FGNS::Flat::touch(block, "");
+            if (cmd.size() >= 2)
+            {
+                EXIT_CODE = !FGNS::Flat::touch(block, cmd[1]);
+            }
             else
-                FGNS::Flat::touch(block, cmd[1]);
+            {
+                fprintf(stderr, "touch: missing argument 'file'\n");
+                EXIT_CODE = 1;
+            }
         }
 
         else if (cmd[0] == "rm")
@@ -465,10 +509,15 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::rm(block, dst, 1);
+                    EXIT_CODE = !FGNS::Flat::rm(block, dst, 1);
                 }
                 else
-                    FGNS::Flat::rm(block, dst);
+                    EXIT_CODE = !FGNS::Flat::rm(block, dst);
+            }
+            else
+            {
+                fprintf(stderr, "rm: missing argument 'file/directory'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -480,10 +529,20 @@ int main(int argc, char *argv[])
                 if (src.front() == '@')
                 {
                     src.erase(0, 1);
-                    FGNS::Flat::cp(block, src, cmd[2], 1);
+                    EXIT_CODE = !FGNS::Flat::cp(block, src, cmd[2], 1);
                 }
                 else
-                    FGNS::Flat::cp(block, src, cmd[2]);
+                    EXIT_CODE = !FGNS::Flat::cp(block, src, cmd[2]);
+            }
+            else if (cmd.size() == 2)
+            {
+                fprintf(stderr, "cp: missing argument 'dst'\n");
+                EXIT_CODE = 1;
+            }
+            else if (cmd.size() == 1)
+            {
+                fprintf(stderr, "cp: missing arguments 'src' 'dst'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -495,10 +554,20 @@ int main(int argc, char *argv[])
                 if (src.front() == '@')
                 {
                     src.erase(0, 1);
-                    FGNS::Flat::mv(block, src, cmd[2], 1);
+                    EXIT_CODE = !FGNS::Flat::mv(block, src, cmd[2], 1);
                 }
                 else
-                    FGNS::Flat::mv(block, src, cmd[2]);
+                    EXIT_CODE = !FGNS::Flat::mv(block, src, cmd[2]);
+            }
+            else if (cmd.size() == 2)
+            {
+                fprintf(stderr, "mv: missing argument 'dst'\n");
+                EXIT_CODE = 1;
+            }
+            else if (cmd.size() == 1)
+            {
+                fprintf(stderr, "mv: missing arguments 'src' 'dst'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -510,10 +579,15 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::cat(block, dst, 1);
+                    EXIT_CODE = !FGNS::Flat::cat(block, dst, 1);
                 }
                 else
-                    FGNS::Flat::cat(block, dst);
+                    EXIT_CODE = !FGNS::Flat::cat(block, dst);
+            }
+            else
+            {
+                fprintf(stderr, "cat: missing argument 'file'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -521,14 +595,31 @@ int main(int argc, char *argv[])
         {
             if (cmd.size() >= 3)
             {
+                std::string content = "";
+                for (int i = 2; i < cmd.size(); i++)
+                {
+                    content += cmd[i];
+                    if (i != cmd.size() - 1)
+                        content += " ";
+                }
                 std::string src = cmd[1];
                 if (src.front() == '@')
                 {
                     src.erase(0, 1);
-                    FGNS::Flat::write(block, src, cmd[2], 1);
+                    EXIT_CODE = !FGNS::Flat::write(block, src, content, 1);
                 }
                 else
-                    FGNS::Flat::write(block, src, cmd[2]);
+                    EXIT_CODE = !FGNS::Flat::write(block, src, content);
+            }
+            else if (cmd.size() == 2)
+            {
+                fprintf(stderr, "write: missing argument 'content'\n");
+                EXIT_CODE = 1;
+            }
+            else if (cmd.size() == 1)
+            {
+                fprintf(stderr, "write: missing arguments 'file' 'content'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -540,10 +631,15 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::info(block, dst, 1);
+                    EXIT_CODE = !FGNS::Flat::info(block, dst, 1);
                 }
                 else
-                    FGNS::Flat::info(block, dst);
+                    EXIT_CODE = !FGNS::Flat::info(block, dst);
+            }
+            else
+            {
+                fprintf(stderr, "info: missing argument 'file'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -555,10 +651,20 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::encrypt(block, dst, cmd[2], 1);
+                    EXIT_CODE = !FGNS::Flat::encrypt(block, dst, cmd[2], 1);
                 }
                 else
-                    FGNS::Flat::encrypt(block, dst, cmd[2]);
+                    EXIT_CODE = !FGNS::Flat::encrypt(block, dst, cmd[2]);
+            }
+            else if (cmd.size() == 2)
+            {
+                fprintf(stderr, "encrypt: missing argument 'password'\n");
+                EXIT_CODE = 1;
+            }
+            else if (cmd.size() == 1)
+            {
+                fprintf(stderr, "encrypt: missing arguments 'file' 'password'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -570,21 +676,47 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::decrypt(block, dst, cmd[2], 1);
+                    EXIT_CODE = !FGNS::Flat::decrypt(block, dst, cmd[2], 1);
                 }
                 else
-                    FGNS::Flat::decrypt(block, dst, cmd[2]);
+                    EXIT_CODE = !FGNS::Flat::decrypt(block, dst, cmd[2]);
+            }
+            else if (cmd.size() == 2)
+            {
+                fprintf(stderr, "decrypt: missing argument 'password'\n");
+                EXIT_CODE = 1;
+            }
+            else if (cmd.size() == 1)
+            {
+                fprintf(stderr, "decrypt: missing arguments 'file' 'password'\n");
+                EXIT_CODE = 1;
             }
         }
 
         else if (cmd[0] == "import")
         {
-            FGNS::Flat::import(block, cmd[1]);
+            if (cmd.size() >= 2)
+            {
+                EXIT_CODE = !FGNS::Flat::import(block, cmd[1]);
+            }
+            else
+            {
+                fprintf(stderr, "import: missing argument 'file'\n");
+                EXIT_CODE = 1;
+            }
         }
 
         else if (cmd[0] == "importdir")
         {
-            FGNS::Flat::importdir(block, cmd[1]);
+            if (cmd.size() >= 2)
+            {
+                EXIT_CODE = !FGNS::Flat::importdir(block, cmd[1]);
+            }
+            else
+            {
+                fprintf(stderr, "importdir: missing argument 'directory'\n");
+                EXIT_CODE = 1;
+            }
         }
 
         else if (cmd[0] == "export")
@@ -595,10 +727,15 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::fexport(block, dst, 1);
+                    EXIT_CODE = !FGNS::Flat::fexport(block, dst, 1);
                 }
                 else
-                    FGNS::Flat::fexport(block, dst);
+                    EXIT_CODE = !FGNS::Flat::fexport(block, dst);
+            }
+            else
+            {
+                fprintf(stderr, "export: missing argument 'file'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -610,10 +747,15 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::exportdir(block, dst, 1);
+                    EXIT_CODE = !FGNS::Flat::exportdir(block, dst, 1);
                 }
                 else
-                    FGNS::Flat::exportdir(block, dst);
+                    EXIT_CODE = !FGNS::Flat::exportdir(block, dst);
+            }
+            else
+            {
+                fprintf(stderr, "exportdir: missing argument 'directory'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -625,10 +767,15 @@ int main(int argc, char *argv[])
                 if (dst.front() == '@')
                 {
                     dst.erase(0, 1);
-                    FGNS::Flat::exists(block, dst, 1);
+                    EXIT_CODE = !FGNS::Flat::exists(block, dst, 1);
                 }
                 else
-                    FGNS::Flat::exists(block, dst);
+                    EXIT_CODE = !FGNS::Flat::exists(block, dst);
+            }
+            else
+            {
+                fprintf(stderr, "exists: missing argument 'target'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -644,6 +791,11 @@ int main(int argc, char *argv[])
                 }
                 else
                     printf("%s\n", FGNS::Flat::checksum(block, dst).c_str());
+            }
+            else
+            {
+                fprintf(stderr, "checksum: missing argument 'file'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -667,11 +819,18 @@ int main(int argc, char *argv[])
                     block = FGNS::Flat::load_bin(arg);
                     mounted = true;
                     mounted_file = arg;
+                    EXIT_CODE = 0;
                 }
                 else
                 {
                     fprintf(stderr, "File not found: %s\n", arg.c_str());
+                    EXIT_CODE = 1;
                 }
+            }
+            else
+            {
+                fprintf(stderr, "mount: missing argument 'file'\n");
+                EXIT_CODE = 1;
             }
         }
 
@@ -680,13 +839,17 @@ int main(int argc, char *argv[])
             if (cmd.size() == 1)
             {
                 if (mounted)
-                    {
-                        FGNS::Flat::save_bin(block, mounted_file);
-                        if (compressed)
-                            FGNS::compress_ext(mounted_file);
-                    }
+                {
+                    FGNS::Flat::save_bin(block, mounted_file);
+                    if (compressed)
+                        FGNS::compress_ext(mounted_file);
+                    EXIT_CODE = 0;
+                }
                 else
-                    fprintf(stderr, "save: missing operand 'filename'\n");
+                {
+                    fprintf(stderr, "save: missing argument 'filename'\n");
+                    EXIT_CODE = 1;
+                }
             }
             else if (cmd.size() >= 2)
             {
@@ -697,6 +860,7 @@ int main(int argc, char *argv[])
                 FGNS::Flat::save_bin(block, filename);
                 mounted = true;
                 mounted_file = filename;
+                EXIT_CODE = 0;
             }
         }
 
@@ -705,8 +869,25 @@ int main(int argc, char *argv[])
             if (cmd.size() >= 2)
             {
                 FGNS::Flat::save_json(block, cmd[1]);
+                EXIT_CODE = 0;
+            }
+            else
+            {
+                fprintf(stderr, "jsondump: missing argument 'file'\n");
+                EXIT_CODE = 1;
             }
         }
+
+        else
+        {
+            fprintf(stderr, "\033[31munknown command\033[0m: %s\n", cmd[0].c_str());
+            EXIT_CODE = 1;
+        }
+
+        if (EXIT_CODE == 0)
+            printf("\033[32m>\033[0m");
+        else
+            printf("\033[31m>\033[0m");
     }
 
     return 0;
