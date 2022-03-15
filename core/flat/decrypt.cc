@@ -20,15 +20,27 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
             {
                 if (FGNS::Crypto::AuthenticatePassword(password, file.HASH, file.SALT))
                 {
-                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.IV);
+                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT);
 
-                    file.content = FGNS::Crypto::AESDecryptString(key, file.content);
-                    file.ENCRYPTED = false;
-                    file.HASH = "";
-                    file.SALT = "";
-                    block.SAVED = false;
+                    std::string decrypted = FGNS::Crypto::AESDecryptString(key, file.IV, file.content);
 
-                    return true;
+                    // check if decrypted starts with "DECRYPTION_ERROR"
+                    if (decrypted.substr(0, 16) == "DECRYPTION_ERROR")
+                    {
+                        fprintf(stderr, "decrypt:%s\n", decrypted.substr(16).c_str());
+                        return false;
+                    }
+                    else
+                    {
+                        file.content = decrypted;
+                        file.ENCRYPTED = false;
+                        file.HASH = "";
+                        file.SALT = "";
+                        file.IV = "";
+                        block.SAVED = false;
+
+                        return true;
+                    }
                 }
                 else
                 {

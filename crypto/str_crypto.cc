@@ -54,17 +54,17 @@ bool FGNS::Crypto::AuthenticatePassword(std::string input, const std::string &au
 
 CryptoPP::SecByteBlock FGNS::Crypto::KDF(std::string password, std::string iv)
 {
-  CryptoPP::SecByteBlock key(CryptoPP::AES::MAX_KEYLENGTH+CryptoPP::AES::BLOCKSIZE);
+  CryptoPP::SecByteBlock key(CryptoPP::AES::DEFAULT_KEYLENGTH);
   CryptoPP::HKDF<CryptoPP::SHA512> hkdf;
   hkdf.DeriveKey(key, key.size(), (const CryptoPP::byte*)password.data(), password.size(), (const CryptoPP::byte*)iv.data(), iv.size(), NULL, 0);
   return key;
 }
 
-std::string FGNS::Crypto::AESEncryptString(CryptoPP::SecByteBlock &key, const std::string &str)
+std::string FGNS::Crypto::AESEncryptString(CryptoPP::SecByteBlock &key, std::string &iv, const std::string &str)
 {
   std::string ciphertext;
   CryptoPP::GCM<CryptoPP::AES>::Encryption e;
-  e.SetKeyWithIV(key, CryptoPP::AES::MAX_KEYLENGTH, key+CryptoPP::AES::MAX_KEYLENGTH);
+  e.SetKeyWithIV(key, key.size(), (const CryptoPP::byte*)iv.data(), iv.size());
   CryptoPP::StringSource ss(str, true,
     new CryptoPP::AuthenticatedEncryptionFilter(e,
       new CryptoPP::StringSink(ciphertext), false, 12
@@ -73,21 +73,28 @@ std::string FGNS::Crypto::AESEncryptString(CryptoPP::SecByteBlock &key, const st
   return ciphertext;
 }
 
-std::string FGNS::Crypto::AESDecryptString(CryptoPP::SecByteBlock &key, const std::string &str)
+std::string FGNS::Crypto::AESDecryptString(CryptoPP::SecByteBlock &key, std::string &iv, const std::string &str)
 {
   std::string plaintext;
-  CryptoPP::GCM<CryptoPP::AES>::Decryption d;
-  d.SetKeyWithIV(key, CryptoPP::AES::MAX_KEYLENGTH, key+CryptoPP::AES::MAX_KEYLENGTH);
-  CryptoPP::AuthenticatedDecryptionFilter df( d,
-      new CryptoPP::StringSink(plaintext),
-      CryptoPP::AuthenticatedDecryptionFilter::DEFAULT_FLAGS, 12
-  );
-  CryptoPP::StringSource ss(str, true,
-    new CryptoPP::Redirector(df)
-  );
-  if (!df.GetLastResult())
+  try
   {
-    return "ERROR: DECRYPTION_FAILED";
+    CryptoPP::GCM<CryptoPP::AES>::Decryption d;
+    d.SetKeyWithIV(key, key.size(), (const CryptoPP::byte*)iv.data(), iv.size());
+    CryptoPP::AuthenticatedDecryptionFilter df( d,
+        new CryptoPP::StringSink(plaintext),
+        CryptoPP::AuthenticatedDecryptionFilter::DEFAULT_FLAGS, 12
+    );
+    CryptoPP::StringSource ss(str, true,
+      new CryptoPP::Redirector(df)
+    );
+    if (!df.GetLastResult())
+    {
+      return "DECRYPTION_ERROR error: data integrity fail";
+    }
+  }
+  catch( CryptoPP::Exception& e )
+  {
+    return "DECRYPTION_ERROR error: " + std::string(e.what());
   }
   return plaintext;
 }
