@@ -20,7 +20,7 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
             {
                 if (FGNS::Crypto::AuthenticatePassword(password, file.HASH, file.SALT))
                 {
-                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT);
+                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.IV);
 
                     file.content = FGNS::Crypto::AESDecryptString(key, file.content);
                     file.ENCRYPTED = false;

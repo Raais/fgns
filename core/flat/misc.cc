@@ -128,7 +128,7 @@ std::string FGNS::Flat::checksum(FGNS::Flat::Block &block, std::string dst, int 
     if (FGNS::Flat::exists(block, dst, mode))
     {
         FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
-        if (file.DIRECTORY == 0)
+        if (file.DIRECTORY)
             return "Directory";
         else
             return FGNS::Crypto::SHA512Digest(file.content);

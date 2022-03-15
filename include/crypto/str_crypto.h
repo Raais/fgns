@@ -6,6 +6,7 @@
 #include "aes.h"
 #include "sha.h"
 #include "hex.h"
+#include "gcm.h"
 #include "hkdf.h"
 #include "osrng.h"
 #include "modes.h"
@@ -15,7 +16,7 @@ namespace FGNS
 {
     namespace Crypto
     {
-        std::string GenerateSalt     ();
+        std::string GenerateRandomBytes     (size_t size);
         std::string SHA512Digest     (const std::string& input);
         std::string SHA256Digest     (const std::string& input);
         std::string HashPassword     (std::string input, const std::string &salt);
