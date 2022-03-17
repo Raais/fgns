@@ -20,7 +20,7 @@ bool FGNS::Flat::cat(FGNS::Flat::Block &block, std::string dst, int mode)
     }
     else
     {
-        printf("%s", "cat: '%s' does not exist\n", dst.c_str());
+        fprintf(stderr, "cat: '%s' does not exist\n", dst.c_str());
         return false;
     }
 }
