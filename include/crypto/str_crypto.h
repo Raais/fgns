@@ -19,7 +19,6 @@ namespace FGNS
         std::string GenerateRandomBytes     (size_t size);
         std::string SHA512Digest     (const std::string& input);
         std::string SHA256Digest     (const std::string& input);
-        bool AuthenticatePassword    (std::string input, const std::string &auth_hash, const std::string &salt);
         CryptoPP::SecByteBlock KDF   (std::string password, std::string iv);
         std::string AESEncryptString (CryptoPP::SecByteBlock &key, std::string &iv, const std::string &str);
         std::string AESDecryptString (CryptoPP::SecByteBlock &key, std::string &iv, const std::string &str);

@@ -18,14 +18,14 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
         {
             if (!file.content.empty())
             {
-                if (FGNS::Crypto::AuthenticatePassword(password, file.HASH, file.SALT))
+                if (FGNS::Crypto::SHA256Digest(password + file.SALT) == file.HASH) // authenticate password match
                 {
-                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT);
+                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT); // kdf
 
-                    std::string IV = FGNS::Crypto::SHA512Digest(password + file.SALT);
+                    std::string IV = FGNS::Crypto::SHA512Digest(password + file.SALT); // for decryption
                     IV.resize(16);
 
-                    std::string decrypted = FGNS::Crypto::AESDecryptString(key, IV, file.content);
+                    std::string decrypted = FGNS::Crypto::AESDecryptString(key, IV, file.content); // decryption
 
                     if (decrypted.substr(0, 16) == "DECRYPTION_ERROR")
                     {

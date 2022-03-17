@@ -40,12 +40,6 @@ std::string FGNS::Crypto::SHA256Digest(const std::string& input)
   return digest;
 }
 
-bool FGNS::Crypto::AuthenticatePassword(std::string input, const std::string &auth_hash, const std::string &salt)
-{
-  std::string input_hash = FGNS::Crypto::SHA256Digest(input + salt);
-  return input_hash == auth_hash;
-}
-
 CryptoPP::SecByteBlock FGNS::Crypto::KDF(std::string password, std::string iv)
 {
   CryptoPP::SecByteBlock key(CryptoPP::AES::DEFAULT_KEYLENGTH);
