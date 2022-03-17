@@ -28,7 +28,6 @@ bool FGNS::Flat::cp(FGNS::Flat::Block &block, std::string src, std::string dst, 
             new_file.ENCRYPTED = source.ENCRYPTED;
             new_file.HASH = source.HASH;
             new_file.SALT = source.SALT;
-            new_file.IV = source.IV;
             block.root.push_back(new_file);
             block.IDSEED++;
 

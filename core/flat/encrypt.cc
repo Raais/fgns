@@ -18,14 +18,16 @@ bool FGNS::Flat::encrypt(FGNS::Flat::Block &block, std::string dst, std::string 
         {
             if (!file.content.empty())
             {
-                file.SALT = FGNS::Crypto::GenerateRandomBytes(16);// password & kdf
-                file.IV = FGNS::Crypto::GenerateRandomBytes(16);// encryption
+                file.SALT = FGNS::Crypto::GenerateRandomBytes(16);// for password & kdf
 
-                file.HASH = FGNS::Crypto::HashPassword(password, file.SALT);
+                file.HASH = FGNS::Crypto::SHA256Digest(password + file.SALT); // password
 
-                CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT);
+                CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT); // kdf
 
-                file.content = FGNS::Crypto::AESEncryptString(key, file.IV, file.content);
+                std::string IV = FGNS::Crypto::SHA512Digest(password + file.SALT); // for encryption
+                IV.resize(16);
+
+                file.content = FGNS::Crypto::AESEncryptString(key, IV, file.content); // encryption
                 file.ENCRYPTED = true;
                 block.SAVED = false;
 

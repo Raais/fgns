@@ -38,7 +38,6 @@ struct File
     bool         ENCRYPTED;
     std::string  HASH;
     std::string  SALT;
-    std::string  IV;
 
     std::string  content;
 
@@ -50,14 +49,14 @@ struct File
 
     File(){}
     File(unsigned int &IDSEED, signed int &PARENT_ID) : TIMESTAMP((unsigned int)std::time(NULL)), NAME(""), ID(IDSEED),
-      PARENT(PARENT_ID), ENCRYPTED(false), HASH(""), SALT(""), IV(""), content(""), DIRECTORY(false){}
+      PARENT(PARENT_ID), ENCRYPTED(false), HASH(""), SALT(""), content(""), DIRECTORY(false){}
 
   private:
     friend class cereal::access;
     template <class Archive> void serialize(Archive &ar)
     {
         ar(CEREAL_NVP(TIMESTAMP), CEREAL_NVP(NAME), CEREAL_NVP(ID), CEREAL_NVP(PARENT), CEREAL_NVP(ENCRYPTED), CEREAL_NVP(HASH),
-          CEREAL_NVP(SALT), CEREAL_NVP(IV), CEREAL_NVP(content), CEREAL_NVP(DIRECTORY), CEREAL_NVP(directories), CEREAL_NVP(files));
+          CEREAL_NVP(SALT), CEREAL_NVP(content), CEREAL_NVP(DIRECTORY), CEREAL_NVP(directories), CEREAL_NVP(files));
     }
 };
 

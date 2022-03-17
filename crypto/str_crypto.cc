@@ -40,15 +40,9 @@ std::string FGNS::Crypto::SHA256Digest(const std::string& input)
   return digest;
 }
 
-std::string FGNS::Crypto::HashPassword(std::string input, const std::string &salt)
-{
-  input = input + salt;
-  return FGNS::Crypto::SHA512Digest(input);
-}
-
 bool FGNS::Crypto::AuthenticatePassword(std::string input, const std::string &auth_hash, const std::string &salt)
 {
-  std::string input_hash = FGNS::Crypto::HashPassword(input, salt);
+  std::string input_hash = FGNS::Crypto::SHA256Digest(input + salt);
   return input_hash == auth_hash;
 }
 

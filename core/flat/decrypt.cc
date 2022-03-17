@@ -22,9 +22,11 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
                 {
                     CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT);
 
-                    std::string decrypted = FGNS::Crypto::AESDecryptString(key, file.IV, file.content);
+                    std::string IV = FGNS::Crypto::SHA512Digest(password + file.SALT);
+                    IV.resize(16);
 
-                    // check if decrypted starts with "DECRYPTION_ERROR"
+                    std::string decrypted = FGNS::Crypto::AESDecryptString(key, IV, file.content);
+
                     if (decrypted.substr(0, 16) == "DECRYPTION_ERROR")
                     {
                         fprintf(stderr, "decrypt:%s\n", decrypted.substr(16).c_str());
@@ -36,7 +38,6 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
                         file.ENCRYPTED = false;
                         file.HASH = "";
                         file.SALT = "";
-                        file.IV = "";
                         block.SAVED = false;
 
                         return true;
