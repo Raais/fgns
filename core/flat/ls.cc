@@ -47,7 +47,7 @@ void FGNS::Flat::ls(FGNS::Flat::Block &block)
             std::string clear = "\033[0m";
             std::string cyan = "\033[36m";
 
-            std::string checksum = StrCrypto::GenericHash(file.content);
+            std::string checksum = StrCrypto::SHA256Digest(file.content);
             checksum = cyan + checksum.substr(0, 6) + clear + magenta + checksum.substr(checksum.size() - 6, 6) + clear;
             
             if (file.content.size() > 20)

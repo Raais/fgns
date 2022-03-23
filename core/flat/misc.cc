@@ -131,7 +131,7 @@ std::string FGNS::Flat::checksum(FGNS::Flat::Block &block, std::string dst, int 
         if (file.DIRECTORY)
             return "Directory";
         else
-            return StrCrypto::GenericHash(file.content);
+            return StrCrypto::SHA256Digest(file.content);
     }
     else
         return "";

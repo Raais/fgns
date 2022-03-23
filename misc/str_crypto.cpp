@@ -1,5 +1,6 @@
 #include "str_crypto.hpp"
 
+//randombytes_buf
 std::string StrCrypto::GenerateRandomBytes(size_t size)
 {
   unsigned char bytes[size];
@@ -7,22 +8,15 @@ std::string StrCrypto::GenerateRandomBytes(size_t size)
   return std::string(reinterpret_cast<char*>(bytes), size);
 }
 
-std::string StrCrypto::GenericHash(const std::string& input)
+//SHA256 Hash
+std::string StrCrypto::SHA256Digest(const std::string& input)
 {
-  const unsigned char *msg = (const unsigned char *)input.data();
-
-  unsigned char hash[crypto_generichash_BYTES];
-
-  crypto_generichash(hash, sizeof hash,
-                   msg, input.size(),
-                   NULL, 0);
-
-  char hex[(crypto_generichash_BYTES * 2) + 1];
-  sodium_bin2hex(hex, sizeof hex, hash, sizeof hash);
-
-  return std::string(hex);
+  std::vector<unsigned char> hash(picosha2::k_digest_size);
+  picosha2::hash256(input.begin(), input.end(), hash.begin(), hash.end());
+  return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
 }
 
+//Argon2 KDF
 std::string StrCrypto::KDF(std::string pwdstr, std::string sltstr)
 {
   char *password = (char *)pwdstr.data();
@@ -39,6 +33,7 @@ std::string StrCrypto::KDF(std::string pwdstr, std::string sltstr)
   return std::string((char *)key, key_len);
 }
 
+//Argon2 Password Storage
 std::string StrCrypto::HashPassword(std::string pwdstr)
 {
   char *password = (char *)pwdstr.data();
@@ -51,6 +46,7 @@ std::string StrCrypto::HashPassword(std::string pwdstr)
   return std::string((char *)hashed_password, crypto_pwhash_STRBYTES);
 }
 
+//Argon2 Verification
 bool StrCrypto::VerifyHash(std::string hashstr, std::string pwdstr)
 {
   char *hash = (char *)hashstr.data();
@@ -65,6 +61,7 @@ bool StrCrypto::VerifyHash(std::string hashstr, std::string pwdstr)
   }
 }
 
+//XChaCha20-Poly1305 AEAD Encryption
 std::string StrCrypto::AEADStringEncrypt(std::string &keystr, std::string &noncestr, const std::string &plainstr)
 {
   const unsigned char *plaintext = (const unsigned char *)plainstr.data();
@@ -84,6 +81,7 @@ std::string StrCrypto::AEADStringEncrypt(std::string &keystr, std::string &nonce
   return std::string((char *)ciphertext, ciphertext_len);
 }
 
+//XChaCha20-Poly1305 AEAD Decryption
 std::string StrCrypto::AEADStringDecrypt(std::string &keystr, std::string &noncestr, const std::string &cipherstr)
 {
   const unsigned char *ciphertext = (const unsigned char *)cipherstr.data();

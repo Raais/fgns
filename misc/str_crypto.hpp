@@ -13,10 +13,12 @@ extern "C"{
 }
 #endif
 
+#include "picosha2.hpp"
+
 namespace StrCrypto
 {
     std::string GenerateRandomBytes(size_t size);
-    std::string GenericHash(const std::string& input);
+    std::string SHA256Digest(const std::string& input);
     std::string KDF(std::string pwdstr, std::string sltstr);
     std::string HashPassword(std::string pwdstr);
            bool VerifyHash(std::string hashstr, std::string pwdstr);
