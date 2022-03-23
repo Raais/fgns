@@ -14,20 +14,26 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
             return false;
         }
 
-        if (file.ENCRYPTED)
+        if (file.content.substr(0, 9) == "$argon2id")
         {
             if (!file.content.empty())
             {
-                if (FGNS::Crypto::SHA256Digest(password + file.SALT) == file.HASH) // authenticate password match
+                std::string ciphertext = file.content;
+                std::string phash = ciphertext.substr(0, crypto_pwhash_STRBYTES);
+                if (StrCrypto::VerifyHash(phash, password))
                 {
-                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT); // kdf
+                    std::string ksalt = ciphertext.substr(crypto_pwhash_STRBYTES, crypto_pwhash_SALTBYTES);
+                    std::string enonce = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES,
+                        crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 
-                    std::string IV = FGNS::Crypto::SHA512Digest(password + file.SALT); // for decryption
-                    IV.resize(16);
+                    std::string ekey = StrCrypto::KDF(password, ksalt);
+                    ciphertext = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES
+                        + crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 
-                    std::string decrypted = FGNS::Crypto::AESDecryptString(key, IV, file.content); // decryption
 
-                    if (decrypted.substr(0, 16) == "DECRYPTION_ERROR")
+                    std::string decrypted = StrCrypto::AEADStringDecrypt(ekey, enonce, ciphertext);
+
+                    if (decrypted == "DECRYPTION_ERROR_MESSAGE_FORGED")
                     {
                         fprintf(stderr, "decrypt:%s\n", decrypted.substr(16).c_str());
                         return false;
@@ -35,9 +41,6 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
                     else
                     {
                         file.content = decrypted;
-                        file.ENCRYPTED = false;
-                        file.HASH = "";
-                        file.SALT = "";
                         block.SAVED = false;
 
                         return true;

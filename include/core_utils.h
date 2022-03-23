@@ -22,8 +22,8 @@ namespace fs = ghc::filesystem;
 #include <rapidfuzz/fuzz.hpp>
 using rapidfuzz::fuzz::ratio;
 
-#include "encode.hpp"
-#include "decode.hpp"
+#include "xz_encode.hpp"
+#include "xz_decode.hpp"
 
 namespace FGNS
 {

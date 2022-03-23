@@ -12,9 +12,10 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 
+#include "str_crypto.hpp"
+
 #include "flat_types.h"
 #include "core_utils.h"
-#include "str_crypto.h"
 
 namespace FGNS
 {

@@ -14,7 +14,7 @@ bool FGNS::Flat::info(FGNS::Flat::Block &block, std::string dst, int mode)
         printf("ID: %u\n", file.ID);
         (!file.DIRECTORY) ? printf("Size: %zuB\n", file.content.size())
          : printf("Size: %zu\n", file.files.size()+file.directories.size());
-        if (!file.DIRECTORY) printf("Encrypted: %d\n", file.ENCRYPTED);
+        if (!file.DIRECTORY) printf("Encrypted: %d\n", (file.content.substr(0, 9) != "$argon2id") ? 0 : 1);
         printf("Timestamp: %u\n", file.TIMESTAMP);
         
         return true;

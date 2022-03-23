@@ -14,21 +14,19 @@ bool FGNS::Flat::encrypt(FGNS::Flat::Block &block, std::string dst, std::string 
             return false;
         }
 
-        if (!file.ENCRYPTED)
+        if (file.content.substr(0, 9) != "$argon2id")
         {
             if (!file.content.empty())
             {
-                file.SALT = FGNS::Crypto::GenerateRandomBytes(16);// for password & kdf
+                std::string phash = StrCrypto::HashPassword(password);
 
-                file.HASH = FGNS::Crypto::SHA256Digest(password + file.SALT); // password
+                std::string ksalt = StrCrypto::GenerateRandomBytes(crypto_pwhash_SALTBYTES);
+                std::string ekey = StrCrypto::KDF(password, ksalt);
+                std::string enonce = StrCrypto::GenerateRandomBytes(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 
-                CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT); // kdf
+                file.content = StrCrypto::AEADStringEncrypt(ekey, enonce, file.content);
+                file.content = phash + ksalt + enonce + file.content;
 
-                std::string IV = FGNS::Crypto::SHA512Digest(password + file.SALT); // for encryption
-                IV.resize(16);
-
-                file.content = FGNS::Crypto::AESEncryptString(key, IV, file.content); // encryption
-                file.ENCRYPTED = true;
                 block.SAVED = false;
 
                 return true;

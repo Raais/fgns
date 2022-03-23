@@ -21,6 +21,10 @@
 
 int main(int argc, char *argv[])
 {
+    if (sodium_init() == -1) {
+        return 1;
+    }
+    
     int EXIT_CODE = 0;
 
     cxxopts::Options options("fgns", "fgns - virtual file system");
