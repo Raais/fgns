@@ -1,46 +1,5 @@
 #include "core_utils.h"
 
-FGNS::File* FGNS::get_file_ptr(std::vector<FGNS::File> &root, std::string dst, int mode)
-{
-    std::string q;
-    for (auto &file : root)
-    {
-        (mode == 0) ? q = file.name : q = std::to_string(file.ID);
-        
-        if (q == dst)
-            return &file;
-    }
-    return nullptr;
-}
-
-std::string FGNS::root_get_target_fuzzy(std::vector<FGNS::File> &root, std::string dst)
-{
-    if (dst.back() == '*')
-        dst.pop_back();
-
-    bool match_found = false;
-    double best_score = 0.0;
-    std::string best_match;
-
-    auto scorer = rapidfuzz::fuzz::CachedRatio<std::string>(dst);
-
-    for (auto &file : root)
-    {
-        double score = scorer.ratio(file.name, best_score);
-        if (score >= best_score)
-        {
-            best_score = score;
-            best_match = file.name;
-            match_found = true;
-        }
-    }
-
-    if (!match_found)
-        return "";
-
-    return best_match;
-}
-
 std::string FGNS::fs_get_target_fuzzy(std::string dst_ext)
 {
     if (dst_ext.back() == '*')
@@ -204,4 +163,21 @@ std::string FGNS::get_file_magic(std::string dst_ext)
 bool FGNS::has_suffix(std::string str, std::string suffix)
 {
     return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+std::vector<std::string> FGNS::usplit(std::string s, std::string delimiter)
+{
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos)
+    {
+        token = s.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back(token);
+    }
+
+    res.push_back(s.substr(pos_start));
+    return res;
 }

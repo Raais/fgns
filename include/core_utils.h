@@ -22,17 +22,11 @@ namespace fs = ghc::filesystem;
 #include <rapidfuzz/fuzz.hpp>
 using rapidfuzz::fuzz::ratio;
 
-#include "encode.hpp"
-#include "decode.hpp"
-
-#include "core_types.h"
+#include "xz_encode.hpp"
+#include "xz_decode.hpp"
 
 namespace FGNS
 {
-          File* get_file_ptr (std::vector<File> &root, std::string dst, int mode = 0);
-
-    std::string root_get_target_fuzzy (std::vector<File> &root, std::string dst);
-
     std::string fs_get_target_fuzzy (std::string dst_ext);
 
     std::string input_sanitizer_special_chars (std::string input);
@@ -48,4 +42,6 @@ namespace FGNS
     std::string get_file_magic (std::string dst_ext);
 
            bool has_suffix (std::string str, std::string suffix);
+
+    std::vector<std::string> usplit(std::string s, std::string delimiter);
 }

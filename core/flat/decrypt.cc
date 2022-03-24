@@ -1,50 +1,69 @@
 #include "flat_utils.h"
 
-bool FGNS::decrypt(FGNS::FlatBlock &block, std::string dst, std::string password, int mode)
+bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string password, int mode)
 {
     if ((mode == 0) && (dst.back() == '*'))
-        dst = FGNS::root_get_target_fuzzy(block.root, dst);
+        dst = FGNS::Flat::get_target_fuzzy(block, dst);
 
-    if (FGNS::exists(block, dst, mode))
+    if (FGNS::Flat::exists(block, dst, mode))
     {
-        FGNS::File &file = *FGNS::get_file_ptr(block.root, dst, mode);
-
-        if (file.ENCRYPTED)
+        FGNS::Flat::File &file = FGNS::Flat::get_file_wrapper(block, dst, mode);
+        if (file.DIRECTORY)
         {
-            if (!file.content.empty())
+            fprintf(stderr, "decrypt: '%s' is a directory\n", dst.c_str());
+            return false;
+        }
+
+        if (file.content.substr(0, 9) == "$argon2id")
+        {
+            std::string ciphertext = file.content;
+            std::string p_hash = ciphertext.substr(0, crypto_pwhash_STRBYTES);
+            if (StrCrypto::VerifyHash(p_hash, password))
             {
-                if (FGNS::Crypto::AuthenticatePassword(password, file.HASH, file.SALT))
+                std::string k_salt = ciphertext.substr(crypto_pwhash_STRBYTES, crypto_pwhash_SALTBYTES);
+                std::string e_nonce = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES,
+                    crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
+
+                std::string e_key = StrCrypto::KDF(password, k_salt);
+                if (e_key == "_error_pwhash_outofmemory_")
                 {
-                    CryptoPP::SecByteBlock key = FGNS::Crypto::KDF(password, file.SALT);
+                    fprintf(stderr, "decrypt: ABORTED: OUT OF MEMORY\n");
+                    return false;
+                }
+                ciphertext = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES
+                    + crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 
-                    file.content = FGNS::Crypto::AESDecryptString(key, file.content);
-                    file.ENCRYPTED = false;
-                    file.HASH = "";
-                    file.SALT = "";
 
-                    return true;
+                std::string decrypted = StrCrypto::AEADStringDecrypt(e_key, e_nonce, ciphertext);
+
+                if (decrypted == "_error_decrypt_messageforged_")
+                {
+                    fprintf(stderr, "decrypt: ABORTED: MESSAGE FORGED\n");
+                    return false;
                 }
                 else
                 {
-                    fprintf(stderr, "Wrong password\n");
-                    return false;
+                    file.content = decrypted;
+                    block.SAVED = false;
+
+                    return true;
                 }
             }
             else
             {
-                fprintf(stderr, "File is empty\n");
+                fprintf(stderr, "decrypt: wrong password\n");
                 return false;
             }
         }
         else
         {
-            fprintf(stderr, "File is not encrypted\n");
+            fprintf(stderr, "decrypt: file is not encrypted\n");
             return false;
         }
     }
     else
     {
-        fprintf(stderr, "File does not exist\n");
+        fprintf(stderr, "decrypt: '%s' does not exist\n", dst.c_str());
         return false;
     }
 }
