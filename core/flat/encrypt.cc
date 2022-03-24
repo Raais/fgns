@@ -16,26 +16,28 @@ bool FGNS::Flat::encrypt(FGNS::Flat::Block &block, std::string dst, std::string 
 
         if (file.content.substr(0, 9) != "$argon2id")
         {
-            if (!file.content.empty())
+            std::string p_hash = StrCrypto::HashPassword(password);
+            if (p_hash == "_error_pwhash_outofmemory_")
             {
-                std::string phash = StrCrypto::HashPassword(password);
-
-                std::string ksalt = StrCrypto::GenerateRandomBytes(crypto_pwhash_SALTBYTES);
-                std::string ekey = StrCrypto::KDF(password, ksalt);
-                std::string enonce = StrCrypto::GenerateRandomBytes(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
-
-                file.content = StrCrypto::AEADStringEncrypt(ekey, enonce, file.content);
-                file.content = phash + ksalt + enonce + file.content;
-
-                block.SAVED = false;
-
-                return true;
-            }
-            else
-            {
-                fprintf(stderr, "encrypt: file is empty\n");
+                fprintf(stderr, "encrypt: ABORTED: OUT OF MEMORY\n");
                 return false;
             }
+
+            std::string k_salt = StrCrypto::GenerateRandomBytes(crypto_pwhash_SALTBYTES);
+            std::string e_key = StrCrypto::KDF(password, k_salt);
+            if (e_key == "_error_pwhash_outofmemory_")
+            {
+                fprintf(stderr, "encrypt: ABORTED: OUT OF MEMORY\n");
+                return false;
+            }
+            std::string e_nonce = StrCrypto::GenerateRandomBytes(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
+
+            file.content = StrCrypto::AEADStringEncrypt(e_key, e_nonce, file.content);
+            file.content = p_hash + k_salt + e_nonce + file.content;
+
+            block.SAVED = false;
+
+            return true;
         }
         else
         {

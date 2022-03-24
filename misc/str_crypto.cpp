@@ -25,10 +25,12 @@ std::string StrCrypto::KDF(std::string pwdstr, std::string sltstr)
   unsigned char *salt = (unsigned char *)sltstr.data();
   unsigned char key[key_len];
 
-  crypto_pwhash
-    (key, sizeof key, password, strlen(password), salt,
-     crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE,
-     crypto_pwhash_ALG_DEFAULT);
+  if (crypto_pwhash
+      (key, sizeof key, password, strlen(password), salt,
+       crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE,
+       crypto_pwhash_ALG_DEFAULT) != 0) {
+    return "_error_pwhash_outofmemory_";
+  }
 
   return std::string((char *)key, key_len);
 }
@@ -39,9 +41,11 @@ std::string StrCrypto::HashPassword(std::string pwdstr)
   char *password = (char *)pwdstr.data();
   char hashed_password[crypto_pwhash_STRBYTES];
 
-  crypto_pwhash_str
-    (hashed_password, password, strlen(password),
-     crypto_pwhash_OPSLIMIT_SENSITIVE, crypto_pwhash_MEMLIMIT_SENSITIVE);
+  if (crypto_pwhash_str
+      (hashed_password, password, strlen(password),
+       crypto_pwhash_OPSLIMIT_SENSITIVE, crypto_pwhash_MEMLIMIT_SENSITIVE) != 0) {
+    return "_error_pwhash_outofmemory_";
+  }
 
   return std::string((char *)hashed_password, crypto_pwhash_STRBYTES);
 }
@@ -98,7 +102,7 @@ std::string StrCrypto::AEADStringDecrypt(std::string &keystr, std::string &nonce
                                                nullptr,
                                                0,
                                                nonce, key) != 0) {
-    return std::string("DECRYPTION_ERROR_MESSAGE_FORGED");
+    return std::string("_error_decrypt_messageforged_");
   }
   return std::string((char *)decrypted, decrypted_len);
 }

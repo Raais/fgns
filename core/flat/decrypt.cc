@@ -16,45 +16,42 @@ bool FGNS::Flat::decrypt(FGNS::Flat::Block &block, std::string dst, std::string 
 
         if (file.content.substr(0, 9) == "$argon2id")
         {
-            if (!file.content.empty())
+            std::string ciphertext = file.content;
+            std::string p_hash = ciphertext.substr(0, crypto_pwhash_STRBYTES);
+            if (StrCrypto::VerifyHash(p_hash, password))
             {
-                std::string ciphertext = file.content;
-                std::string phash = ciphertext.substr(0, crypto_pwhash_STRBYTES);
-                if (StrCrypto::VerifyHash(phash, password))
+                std::string k_salt = ciphertext.substr(crypto_pwhash_STRBYTES, crypto_pwhash_SALTBYTES);
+                std::string e_nonce = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES,
+                    crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
+
+                std::string e_key = StrCrypto::KDF(password, k_salt);
+                if (e_key == "_error_pwhash_outofmemory_")
                 {
-                    std::string ksalt = ciphertext.substr(crypto_pwhash_STRBYTES, crypto_pwhash_SALTBYTES);
-                    std::string enonce = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES,
-                        crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
-
-                    std::string ekey = StrCrypto::KDF(password, ksalt);
-                    ciphertext = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES
-                        + crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
+                    fprintf(stderr, "decrypt: ABORTED: OUT OF MEMORY\n");
+                    return false;
+                }
+                ciphertext = ciphertext.substr(crypto_pwhash_STRBYTES + crypto_pwhash_SALTBYTES
+                    + crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 
 
-                    std::string decrypted = StrCrypto::AEADStringDecrypt(ekey, enonce, ciphertext);
+                std::string decrypted = StrCrypto::AEADStringDecrypt(e_key, e_nonce, ciphertext);
 
-                    if (decrypted == "DECRYPTION_ERROR_MESSAGE_FORGED")
-                    {
-                        fprintf(stderr, "decrypt:%s\n", decrypted.substr(16).c_str());
-                        return false;
-                    }
-                    else
-                    {
-                        file.content = decrypted;
-                        block.SAVED = false;
-
-                        return true;
-                    }
+                if (decrypted == "_error_decrypt_messageforged_")
+                {
+                    fprintf(stderr, "decrypt: ABORTED: MESSAGE FORGED\n");
+                    return false;
                 }
                 else
                 {
-                    fprintf(stderr, "decrypt: wrong password\n");
-                    return false;
+                    file.content = decrypted;
+                    block.SAVED = false;
+
+                    return true;
                 }
             }
             else
             {
-                fprintf(stderr, "decrypt: file is empty\n");
+                fprintf(stderr, "decrypt: wrong password\n");
                 return false;
             }
         }

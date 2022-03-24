@@ -7,9 +7,8 @@
 
 #include "cxxopts.hpp"
 
-#define FGNS_VERSION "0.9.2"
-#define LICENSE_TEXT "Copyright (c) 2022 Raais N.\n" \
-"\n" \
+#define FGNS_VERSION "1.0.0"
+#define LICENSE_TEXT "© 2022 Raais N.\n" \
 "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" \
 "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" \
 "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" \
@@ -27,7 +26,7 @@ int main(int argc, char *argv[])
     
     int EXIT_CODE = 0;
 
-    cxxopts::Options options("fgns", "fgns - virtual file system");
+    cxxopts::Options options("fgns", "fgns - structured file formats / virtual file system");
 
     options.add_options()
         ("h,help", "print usage")
@@ -54,7 +53,7 @@ int main(int argc, char *argv[])
         ("e,export", "export <dst>", cxxopts::value<std::string>())
         ("E,exportdir", "export directory <dst>", cxxopts::value<std::string>())
         ("q,exists", "check if <dst> exists and return 0/1", cxxopts::value<std::string>())
-        ("H,checksum", "print SHA512 sum of <dst>", cxxopts::value<std::string>())
+        ("H,checksum", "print SHA256 sum of <dst>", cxxopts::value<std::string>())
         ("X,compress", "compress <FILE>", cxxopts::value<std::string>())
         ("x,decompress", "decompress <FILE.xz>", cxxopts::value<std::string>())
         ("J,jsondump", "dump block as json to <dst_ext>", cxxopts::value<std::string>())
@@ -81,14 +80,14 @@ int main(int argc, char *argv[])
         "Append asterisk (*) to a query to get fuzzy/closest match.\n"\
             "\tEg. \"--cat paswrod.txt*\" -> password.txt\n"\
         "\"@id\" can also be used in a query instead of the filename.\n"\
-            "\tEg. \"--rm @0\" -> deleted [0] - cat.png\n",\
+            "\tEg. \"--rm @0\" -> deleted [0] - dog.png\n",\
         options.help().c_str());
         exit(0);
     }
 
     if (result.count("version"))
     {
-        printf("fgns %s\n%s\n", FGNS_VERSION, LICENSE_TEXT);
+        printf("fgns %s\nCopyright %s\n", FGNS_VERSION, LICENSE_TEXT);
         exit(0);
     }
 
@@ -372,7 +371,7 @@ int main(int argc, char *argv[])
     }
 
     // interactive mode
-    printf("FGNS %s © Raais N. 2022\n\033[32m>\033[0m", FGNS_VERSION);
+    printf("fgns %s\nCopyright %s\n\033[32m>\033[0m", FGNS_VERSION, LICENSE_TEXT);
     std::string command;
     while (std::getline(std::cin, command))
     {
@@ -420,7 +419,7 @@ int main(int argc, char *argv[])
             printf("   \033[34mexists\033[0m    : 'target exists' bool\n");
             printf("   \033[34mexport\033[0m    : export file\n");
             printf("   \033[34mexportdir\033[0m : export directory\n");
-            printf("   \033[34mchecksum\033[0m  : print SHA512 sum\n");
+            printf("   \033[34mchecksum\033[0m  : print SHA256 sum\n");
             printf("   \033[34mset\033[0m       : set settings\n");
             printf("   \033[34mjsondump\033[0m  : create file\n");
             printf("   \033[34munmount\033[0m   : unmount file\n");
@@ -452,8 +451,6 @@ int main(int argc, char *argv[])
             }
             else
             {
-                // a one-liner can easily be recovered by pressing up
-                // this is not the case for interactive mode
                 if (!block.SAVED)
                 {
                     printf("\033[31mWARNING\033[0m: block not saved.\n");

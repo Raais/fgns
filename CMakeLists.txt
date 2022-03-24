@@ -7,7 +7,6 @@ project(fgns)
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 set(CORE_DIR ${CMAKE_SOURCE_DIR}/core)
-set(CRYPTO_DIR ${CMAKE_SOURCE_DIR}/crypto)
 set(MISC_DIR ${CMAKE_SOURCE_DIR}/misc)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")

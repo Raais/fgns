@@ -19,7 +19,7 @@ Tree block:
 
 #include <cereal/cereal.hpp>
 
-#define FLAT_BLOCK_EXTENSION ".cfbo" // "Cereal"ized flat block object //
+#define FLAT_BLOCK_EXTENSION ".cfo3" // "[C]ereal"ized [F]lat-Block [O]bject //
 
 namespace FGNS
 {
