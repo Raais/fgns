@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         ("C,cat", "cat <dst>", cxxopts::value<std::string>())
         ("w,write", "(-t <src>) write <content>", cxxopts::value<std::string>())
         ("Q,info", "print info about <dst>", cxxopts::value<std::string>())
-        ("A,encrypt", "(-t <src>) AES encrypt with <password>", cxxopts::value<std::string>())
+        ("A,encrypt", "(-t <src>) encrypt with <password>", cxxopts::value<std::string>())
         ("D,decrypt", "(-t <src>) decrypt with <password>", cxxopts::value<std::string>())
         ("i,import", "import external <dst_ext>", cxxopts::value<std::string>())
         ("I,importdir", "import external <dstdir_ext>\nSee also:\n"\
