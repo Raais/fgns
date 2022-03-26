@@ -5,35 +5,68 @@ set(CMAKE_CXX_FLAGS_RELEASE "-s -Os")
 
 project(fgns)
 
-set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
-set(CORE_DIR ${CMAKE_SOURCE_DIR}/core)
-set(MISC_DIR ${CMAKE_SOURCE_DIR}/misc)
+option(FGNS_STATIC "Build static" OFF)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-find_package(Sodium REQUIRED)
-find_package(LibLZMA REQUIRED)
+set(BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(THIRD_PARTY_DIR ${BASE_DIR}/third-party)
+set(CORE_DIR ${BASE_DIR}/core)
+set(MISC_DIR ${BASE_DIR}/misc)
+set(LIBS_DIR ${BASE_DIR}/libs)
+
+list(APPEND CMAKE_MODULE_PATH "${BASE_DIR}/cmake")
+
+if (NOT FGNS_STATIC)
+    find_package(Sodium REQUIRED)
+    find_package(LibLZMA REQUIRED)
+endif()
 
 add_subdirectory(${THIRD_PARTY_DIR}/rapidfuzz)
 
 file(GLOB_RECURSE CORE_DIR_GLOB ${CORE_DIR}/*.cc)
 file(GLOB_RECURSE MISC_DIR_GLOB ${MISC_DIR}/*.cpp)
+set(SOURCE_FILES ${CORE_DIR_GLOB}
+                    ${MISC_DIR_GLOB})
 
-set(SOURCE_FILES ${CMAKE_SOURCE_DIR}/fgns.cc
-                    ${CORE_DIR_GLOB}
-                        ${MISC_DIR_GLOB})
+add_library(fgns ${SOURCE_FILES})
 
-add_executable(fgns ${SOURCE_FILES})
+if (NOT FGNS_STATIC)
+    set(LIB_INCLUDES ${sodium_INCLUDE_DIR} ${LIBLZMA_INCLUDE_DIRS})
+else()
+    set(LIBSODIUM ${LIBS_DIR}/libsodium-stable/src/libsodium)
+    set(LIBLZMA ${LIBS_DIR}/lzma)
+    set(LIB_INCLUDES ${LIBSODIUM}/include
+                     ${LIBLZMA}/include
+                     )
+endif()
 
-target_include_directories(fgns PRIVATE ${CMAKE_SOURCE_DIR}/include
-                                        ${MISC_DIR}
-                                        ${sodium_INCLUDE_DIR}
-                                        ${LIBLZMA_INCLUDE_DIRS}
-                                        ${THIRD_PARTY_DIR}/cereal/include
-                                        ${THIRD_PARTY_DIR}/cxxopts
-                                        ${THIRD_PARTY_DIR}/filesystem/include
-                                        )
+file(GLOB_RECURSE INCLUDE_DIR_GLOB ${BASE_DIR}/include/*.h)
+file(GLOB_RECURSE MISC_DIR_H_GLOB ${MISC_DIR}/*.hpp)
+set(HEADER_FILES ${INCLUDE_DIR_GLOB}
+                 ${MISC_DIR_H_GLOB}
+                 )
 
-target_link_libraries(fgns sodium rapidfuzz::rapidfuzz ${LIBLZMA_LIBRARIES})
+set_target_properties(fgns PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
+target_include_directories(fgns PUBLIC ${BASE_DIR}/include
+                                       ${MISC_DIR}
+                                       ${LIB_INCLUDES}
+                                       ${THIRD_PARTY_DIR}/cereal/include
+                                       ${THIRD_PARTY_DIR}/cxxopts
+                                       ${THIRD_PARTY_DIR}/filesystem/include
+                                       )
+
+add_executable(fgnsx ${BASE_DIR}/fgns.cc)
+set_target_properties(fgnsx PROPERTIES OUTPUT_NAME fgns)
+
+if (NOT FGNS_STATIC)
+    target_link_libraries(fgns sodium ${LIBLZMA_LIBRARIES} rapidfuzz::rapidfuzz)
+    target_link_libraries(fgnsx fgns)
+else()
+    target_link_libraries(fgns -static ${LIBSODIUM}/.libs/libsodium.a
+                                       ${LIBLZMA}/bin/linux/release/liblzma.a
+                                       rapidfuzz::rapidfuzz
+                                       )
+    target_link_libraries(fgnsx -static fgns)
+endif()
 
 set(INSTALL_DIR /usr/local/bin)
 install(TARGETS fgns DESTINATION ${INSTALL_DIR})

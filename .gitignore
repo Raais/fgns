@@ -1,5 +1,5 @@
 build/
 backup/
 .vscode/
-libs/lzma/
-libs/cryptopp/
+libs/
+tmp/
