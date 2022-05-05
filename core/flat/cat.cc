@@ -14,7 +14,8 @@ bool FGNS::Flat::cat(FGNS::Flat::Block &block, std::string dst, int mode)
             return false;
         }
 
-        printf("%s\n", file.content.c_str());
+        for (auto &ch : file.content)
+            printf("%c", ch);
         
         return true;
     }
